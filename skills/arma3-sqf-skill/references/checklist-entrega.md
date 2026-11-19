@@ -83,6 +83,6 @@ Cada punto de control debe evaluarse de forma determinista y honesta bajo uno de
 
 ---
 
-## 3. Sección Diferencial: Misiones (Eden) vs Addons (Mods)
+## 3. Sección Diferencial: Misiones de Escenario vs Addons (Mods)
 
 > Para criterios específicos según el tipo de proyecto, consultar [diferencial-misiones-addons.md](diferencial-misiones-addons.md).

@@ -141,3 +141,58 @@ def test_no_absolute_paths_in_integrations_artifacts() -> None:
 
     assert not offenders, "Rutas absolutas no permitidas en integrations/:\n" + "\n".join(offenders)
 
+
+def test_no_local_machine_paths_in_versioned_files() -> None:
+    """Fase 4 (F4.3 + F4.6): Ningún fichero versionado contiene rutas de la máquina local del autor.
+
+    Comprueba sobre git ls-files (todo el material versionado):
+    - Literales C:\\Users\\, C:/Users/ (case-insensitive)
+    - Literales /Users/<usuario> (case-insensitive)
+    - La cadena 'EDEN EDITOR' (re.IGNORECASE)
+    - Rutas absolutas a /home/<usuario>
+    """
+    import subprocess
+
+    try:
+        proc = subprocess.run(
+            ["git", "ls-files"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        tracked_files = [REPO_ROOT / line.strip() for line in proc.stdout.splitlines() if line.strip()]
+    except (subprocess.SubprocessError, FileNotFoundError):
+        tracked_files = [
+            p for p in REPO_ROOT.rglob("*")
+            if p.is_file() and not any(part in EXCLUDED_DIRS for part in p.relative_to(REPO_ROOT).parts)
+        ]
+
+    forbidden_patterns = [
+        re.compile(r"C:[\\/]Users[\\/]", re.IGNORECASE),
+        re.compile(r"/Users/[a-zA-Z0-9_.-]+", re.IGNORECASE),
+        re.compile(r"EDEN\s+EDITOR", re.IGNORECASE),
+        re.compile(r"/home/(?!steam|runner)[a-zA-Z0-9_.-]+"),
+    ]
+
+    binary_exts = {".png", ".ico", ".pyc", ".db", ".sqlite", ".tar", ".gz", ".zip"}
+    offenders: list[str] = []
+
+    for path in tracked_files:
+        if path.resolve() == THIS_FILE or path.suffix.lower() in binary_exts:
+            continue
+        if path.name == "INSTRUCCION-ANTIGRAVITY-PR7.md":
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            continue
+
+        rel = path.relative_to(REPO_ROOT).as_posix()
+        for pat in forbidden_patterns:
+            for match in pat.finditer(text):
+                line_no = text[: match.start()].count("\n") + 1
+                offenders.append(f"{rel}:{line_no}: coincide con {pat.pattern!r} -> {match.group(0)!r}")
+
+    assert not offenders, "Rutas de máquina local encontradas en ficheros versionados:\n" + "\n".join(offenders)
+
