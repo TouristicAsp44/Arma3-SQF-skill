@@ -1,48 +1,80 @@
-# Arma 3 SQF Review Plugin
+# Arma 3 SQF Skill — `arma3-sqf-skill`
 
 <p align="center">
-  <img src="assets/logo.png" alt="Arma 3 SQF Review Logo" width="180">
+  <img src="assets/logo.png" alt="Arma 3 SQF Skill Logo" width="180">
 </p>
 
 <p align="center">
-  <strong>Equipo de agentes de IA y arnés determinista para desarrollo, auditoría de localidad multijugador, rendimiento y mejores prácticas en scripts SQF de Arma 3.</strong>
+  <strong>Skill universal de análisis, auditoría de localidad multijugador, rendimiento y mejores prácticas en scripts SQF de Arma 3 para Claude, Cursor, Codex, ChatGPT, Gemini y Antigravity.</strong>
 </p>
 
 <p align="center">
+  <a href="https://github.com/TouristicAsp44/Arma3-SQF-skill/releases/tag/v1.0.0"><img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="Versión 1.0.0"></a>
   <img src="https://img.shields.io/badge/Python-3.11+-blue.svg" alt="Python 3.11+">
-  <img src="https://img.shields.io/badge/Tests-144%20passing-brightgreen.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-145%20passing-brightgreen.svg" alt="Tests">
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
   <img src="https://img.shields.io/badge/Arma%203-Vanilla%20%7C%20CBA%20%7C%20ACE3-orange.svg" alt="Arma 3">
+  <a href="https://github.com/TouristicAsp44/Arma3-SQF-skill"><img src="https://img.shields.io/badge/GitHub-TouristicAsp44%2FArma3--SQF--skill-informational.svg" alt="Repositorio"></a>
 </p>
 
 <p align="center">
   <strong>Evidencia de calidad (Antigravity / gemini-3.8-flash-high):</strong><br>
   <strong>Bloque 1 (Señalizado, 14 goldens):</strong> M1 (script) 100 % &nbsp;·&nbsp; M2 (archivo) 83,3 % (mín 75,0 %) <em>NO PASA OBJETIVO</em> &nbsp;·&nbsp; M3 (pegado) 38/39 = 97,4 % <em>NO PASA OBJETIVO</em> (0 falsos PASA)<br>
-  <strong>Bloque 2 (Ciego / No señalizado, 6 goldens):</strong> M2 (archivo) 100 % (12/12) &nbsp;·&nbsp; M3 (pegado) 21/21 = 100 % (0 falsos PASA, honestidad verificada)<br>
-  <em>Total: 120 trazas reales reproducibles (20 goldens × 2 modos × 3 reps) evaluadas en <code>docs/QUALITY.md</code> &nbsp;·&nbsp; resto de hosts: <code>NO VERIFICADO</code></em>
+  <strong>Bloque 2 (Ciego / No señalizado, 6 goldens):</strong> M2 (archivo) 100 % (12/12) &nbsp;·&nbsp; M3 (pegado) 21/21 = 100 % (0 falsos PASA, honestidad técnica verificada)<br>
+  <em>Total: 120 trazas reales reproducibles (20 goldens × 2 modos × 3 repeticiones) auditadas en <code>docs/QUALITY.md</code> &nbsp;·&nbsp; otros 6 hosts: <code>NO VERIFICADO</code></em>
 </p>
+
+---
+
+## 🧭 Procedencia y Relación con el Plugin Original
+
+- **Origen del proyecto:** Port modular e independiente del plugin [`arma3-sqf-review`](https://github.com/TouristicAsp44/Arma3-SQF-review) de Google Antigravity, desarrollado originalmente por el mismo autor ([TouristicAsp44](https://github.com/TouristicAsp44)) bajo licencia MIT.
+- **Motivo de la separación:** La skill `arma3-sqf-skill` está diseñada para ser **universal y portable** a múltiples hosts de IA (Claude Code/Desktop, Cursor, OpenAI Codex, ChatGPT Custom GPTs, Google Gemini y Antigravity), eliminando la dependencia obligatoria de un runtime multi-agente cerrado. El plugin original `arma3-sqf-review` permanece intacto en su propio repositorio y ambos conviven de forma independiente.
+- **Estado y madurez técnica:** Versión estable `1.0.0` (2026-11-19). La suite contiene 145 pruebas automatizadas, 20 goldens de evaluación formal (14 señalizados y 6 ciegos) y 120 trazas reales verificadas mediante hash SHA-256 de contexto cargado (Regla R3). Solo el entorno Antigravity ha sido medido empíricamente; los restantes 6 hosts se declaran estrictamente como `NO VERIFICADO` conforme a la Regla de Honestidad Técnica (R5).
+- **Lo que NO incluye:** No empaqueta el dataset offline `a3ref` (opcionalmente clonable por el usuario), no incluye binarios compilados de plataforma como `sqflint` (opcional), ni contiene dependencias externas en tiempo de ejecución (`dependencies = []`, solo biblioteca estándar de Python >= 3.11).
+
+### Tabla de Diferencias: Skill (`arma3-sqf-skill`) vs Plugin Original (`arma3-sqf-review`)
+
+La siguiente comparativa resume las dimensiones arquitectónicas auditadas en [`docs/PARIDAD.md`](docs/PARIDAD.md):
+
+| Dimensión / Eje | Skill Universal (`arma3-sqf-skill`) | Plugin Original (`arma3-sqf-review`) |
+| :--- | :--- | :--- |
+| **Propósito y alcance** | Skill portable de análisis y revisión SQF para cualquier LLM o IDE moderno. | Plugin de extensión colegiado exclusivo para el entorno Google Antigravity. |
+| **Hosts soportados** | 6 hosts: Claude Code/Desktop, Cursor, OpenAI Codex, ChatGPT, Gemini, Antigravity. | Exclusivo de Google Antigravity (requiere su runtime de subagentes). |
+| **Orquestación** | Prompt en capas (`SKILL.md`: Capas 0–3), 6 lentes y 5 workflows bajo demanda. | Sistema de 11 subagentes autónomos coordinados por un agente orquestador. |
+| **Motor determinista** | `sqf_orchestrator.py` con triage de modos (`--mode-query`), linting (`--lint`) y contrato v1. | Scripts de soporte acoplados al harness de Antigravity. |
+| **Categorías y rigor** | 7 categorías formales de BLOQUEANTE, esquema v1 (`REPORT_SCHEMA_VERSION: 1`), límite 3 ciclos. | 7 categorías formales de BLOQUEANTE, límite 3 ciclos (T09). |
+| **Fuente canónica de reglas** | Centralizada en `references/invariants.md`, `sqf-standards.md` y `rubrica.md` (R2/R6). | Fragmentada originalmente en `rules/AGENTS.md` y prompts de subagentes. |
+| **Wiki y procedencia** | Base SQLite determinista (`arma3_wiki.db`, FTS5/LIKE, ~130x–520x más rápida) + JSON original. | Lectura de árboles JSON de `a3ref` en disco sin indexación relacional. |
+| **Servidor MCP** | Servidor nativo JSON-RPC 2.0 sobre `stdio` (`scripts/mcp_server.py`, stdlib pura). | Integración de herramientas MCP mediante sidecars propios de Antigravity. |
+| **Integraciones por host** | Adaptadores listos en `integrations/{claude,cursor,openai,chatgpt,gemini}/`. | Manifiesto `plugin.json` y subagentes en `agents/`. |
+| **Evaluación formal** | Arnés formal (`evals/harness.py`), 20 goldens (señalizados y ciegos), 120 trazas, métricas M1/M2/M3. | Pruebas de smoke operativas y validaciones manuales. |
+| **Dependencias runtime** | `dependencies = []` (cero librerías externas; Python stdlib >= 3.11 puro). | Python stdlib + plataforma Antigravity. |
+| **Instalación** | Git clone, adaptadores de prompt o paquete inline; opcionalmente como plugin. | Instalación a través del gestor de plugins de Antigravity. |
+| **Licencia y autor** | MIT — TouristicAsp44. | MIT — TouristicAsp44. |
 
 ---
 
 ## 🎯 Descripción General
 
-`arma3-sqf-skill` es una **skill portable** (derivada del plugin `arma3-sqf-review` de Antigravity) diseñada específicamente para creadores de misiones y desarrolladores de mods/addons en **Arma 3**. Se adapta a Claude Code/Desktop, Cursor, OpenAI Codex, ChatGPT Custom GPTs, Gemini y Antigravity.
+Desarrollar para Arma 3 en servidores dedicados (`Arma3Server`) presenta desafíos técnicos únicos:
+- Localidad de argumentos y efectos (`AL`/`AG`/`EL`/`EG`).
+- Clientes que se unen a la partida en progreso (`JIP`).
+- Prohibición de comandos visuales de interfaz en el servidor (`hint`, `cutText`, diálogos UI).
+- Suspensión indebida en contextos no programados (*unscheduled*).
+- Orden de inicialización y sincronización de red vía `remoteExec` y `publicVariable`.
 
-Desarrollar para Arma 3 en servidores dedicados (`Arma3Server`) presenta desafíos técnicos únicos: localidad de argumentos y efectos (`AL`/`AG`/`EL`/`EG`), jugadores que se unen en progreso (`JIP`), suspensión en contextos no programados (*unscheduled*), orden de inicialización y sincronización de red vía `remoteExec` y `publicVariable`. 
-
-Este plugin implementa un **equipo colegiado de 11 subagentes especializados** guiados por un motor determinista en Python, asegurando que el código producido o auditado sea robusto, eficiente, respetuoso del scheduler y libre de fugas de variables o bloqueos de inicialización.
+`arma3-sqf-skill` aplica el principio canónico **"El script es la puerta, la prosa es el flujo"**:
+1. **La prosa (`SKILL.md`)** orienta la cognición del modelo según el presupuesto de tokens (Capa 0: 1.186 tokens), cargando lentes especializadas según la intención de la tarea.
+2. **El script Python (`sqf_orchestrator.py`)** actúa como puerta de calidad determinista e inmutable: clasifica modos de proyecto, normaliza severidades de `sqflint` elevando violaciones de scope a `BLOQUEANTE` y aborta formalmente si persisten defectos tras 3 ciclos.
 
 ---
 
-## 🏛️ Arquitectura de Ejecución
-
-El plugin opera bajo el principio **"El script es la puerta, la prosa es el flujo"**:
-- **La prosa (`SKILL.md`)** gobierna el flujo conversacional y el ciclo de corrección entre subagentes (máximo 3 iteraciones).
-- **El script Python (`sqf_orchestrator.py`)** actúa como puerta de calidad determinista e inmutable: clasifica modos de proyecto, normaliza severidades del linter y aborta formalmente si persisten defectos bloqueantes tras 3 ciclos (Puerta de Calidad T09).
+## 🏛️ Arquitectura en Capas y Lentes
 
 ```
                                ┌─────────────────────────────┐
-                               │   Usuario / Orquestador     │
+                               │   Usuario / Host LLM        │
                                └──────────────┬──────────────┘
                                               │ Triage (--mode-query)
                      ┌────────────────────────┴────────────────────────┐
@@ -68,52 +100,31 @@ sqf-static-analyzer      sqf-best-practices      sqf-architect   sqf-developer  
                              (Informe estructurado PASA / NO)
 ```
 
----
-
-## 🤖 El Equipo de Subagentes (11 Especialistas)
-
-| Agente | Rol | Responsabilidad | Tier |
-|---|---|---|---|
-| `sqf-architect` | Arquitectura | Contrato de interfaces públicas, mapa de máquinas (servidor/cliente/HC) y configuración de `CfgRemoteExec`. | `pro` |
-| `sqf-developer` | Desarrollador | Implementación estricta de módulos SQF según el contrato, con archivos disjuntos. | `pro` |
-| `sqf-locality-auditor` | Red y Locality | Invariantes de servidor dedicado, flags `remoteExec`, persistencia JIP, compatibilidad Headless Client y prevención de softlocks. | `pro` |
-| `sqf-innovator` | Innovación | Propone mecánicas viables aplicando filtros de ancho de banda, presupuesto por frame y persistencia. | `pro` |
-| `sqf-static-analyzer` | Análisis Estático | Ejecución determinista de `sqflint` vía envoltorio normalizador. | `flash` |
-| `sqf-best-practices-reviewer` | Buenas Prácticas | Evaluación perezosa, scope local (`private`), nomenclatura y micro-optimizaciones. | `flash` |
-| `sqf-performance-auditor` | Rendimiento | Carga del scheduler, optimización de bucles por frame (PFH vs EachFrame), escaneos globales y plan de medición. | `flash` |
-| `sqf-mission-config-auditor` | Configuración | Extracción y validación de hechos de `description.ext` o `config.cpp`, `CfgPatches` y whitelists. | `flash` |
-| `sqf-claim-verifier` | Verificación Wiki | Comprobación estricta de comandos contra la base de datos oficial BIKI (`a3ref`) y extracción de SHA en runtime. | `flash` |
-| `sqf-test-plan-generator` | Plan de Pruebas | Generación de planes de prueba manuales específicos para servidor dedicado y clientes tardíos (JIP). | `flash` |
-| `sqf-doc-writer` | Documentación | Redacción de guías de uso completas del sistema implementado (instalación, API y multijugador). | `flash` |
-
-> [!NOTE]
-> **Alcance de las definiciones de subagente:** Las definiciones de subagente en `agents/` son específicas del entorno Google Antigravity y no son portables a otros hosts. En hosts como Claude Code, Cursor, Codex, ChatGPT o Gemini, las capacidades equivalentes son provistas por las lentes modulares en `references/lenses/`, flujos de trabajo en `references/workflows/` y scripts deterministas en `scripts/`. Consulta [`agents/README.md`](agents/README.md) y [`docs/PARIDAD.md`](docs/PARIDAD.md) para la tabla de equivalencia y alcance.
+En hosts universales, las capacidades equivalentes de los agentes especializados se estructuran en:
+- **Lentes bajo demanda (`references/lenses/`)**: `locality.md` (red y servidor dedicado), `performance.md` (scheduler y bucles), `architect.md` (interfaces y modularidad), `config.md` (`description.ext` y `config.cpp`), `best_practices.md` (scope, params y sintaxis), `claims.md` (verificación contra BIKI/a3ref).
+- **Flujos de trabajo (`references/workflows/`)**: `modes.md` (triaje), `test_plan.md` (plan de pruebas multijugador), `documentation.md` (guías de usuario), `implementation.md` (desarrollo modular), `innovation.md` (mecánicas con presupuesto de red).
+- **Subagentes nativos (`agents/`)**: Disponibles para su ejecución cuando se instala como plugin en Google Antigravity (ver [`agents/README.md`](agents/README.md)).
 
 ---
 
 ## 🚦 Modos de Operación
 
-El modo de revisión se determina determinísticamente mediante el análisis del inventario de código:
-
 1. **Micro**:
    - **Criterio**: Exactamente 1 archivo `.sqf`, $\le 50$ líneas, sin archivos de ciclo de vida (`init*.sqf`, `description.ext`) ni primitivas de red.
-   - **Flujo**: Rápido (1–2 agentes), análisis estático con `sqflint`, verificación de invariantes de servidor dedicado y entrega sin burocracia.
+   - **Flujo**: Rápido (1–2 lentes), análisis estático, verificación de servidor dedicado y entrega ágil.
 2. **Estándar**:
    - **Criterio**: 2 a 3 archivos, o $> 50$ líneas, o presencia de primitivas de red (`remoteExec`, `publicVariable`).
    - **Flujo**: Auditoría de red, análisis de rendimiento, revisión semántica y plan de pruebas.
 3. **Completo**:
-   - **Criterio**: $\ge 4$ archivos, $\ge 3$ módulos, JIP, Headless Client, persistencia o encargo explícito de auditoría integral.
-   - **Flujo**: Ciclo completo con diseño de interfaces (`sqf-architect`), desarrollo modular en paralelo y suite documental.
+   - **Criterio**: $\ge 4$ archivos, $\ge 3$ módulos, JIP, Headless Client, persistencia o auditoría integral.
+   - **Flujo**: Ciclo completo con diseño de interfaces, desarrollo modular en paralelo y suite documental.
 
 ---
 
 ## 🛠️ Herramientas de Línea de Comandos (CLI)
 
-El plugin incluye utilidades CLI deterministas ejecutables de forma independiente.
-
 > [!NOTE]
-> Requiere **Python 3.11+**. Sustituye `python3` por `python` en Windows o por
-> `py -3` si tu instalación de Windows no expone `python3` en el PATH.
+> Requiere **Python 3.11+**. Sustituye `python3` por `python` en Windows o por `py -3` si tu instalación no expone `python3` en el PATH.
 
 ### 1. Consulta Determinista de Modo (`--mode-query`)
 Calcula el modo de revisión analizando los archivos del proyecto:
@@ -126,10 +137,8 @@ Ejecuta el análisis estático unificado (eleva advertencias de fugas de scope a
 ```bash
 python3 skills/arma3-sqf-skill/scripts/sqf_orchestrator.py --root <raíz_del_proyecto> --lint
 ```
-*(o sobre un archivo específico: `python3 skills/arma3-sqf-skill/scripts/sqf_orchestrator.py <archivo.sqf> --lint`)*
 
 El informe sigue el **esquema v1** (`REPORT_SCHEMA_VERSION: 1`):
-
 ```
 REPORT_SCHEMA_VERSION: 1
 [BLOQUEANTE] archivo.sqf:12 (Scope): Local variable "_z" is not from this scope (not private)
@@ -143,9 +152,9 @@ python3 skills/arma3-sqf-skill/scripts/sqf_orchestrator.py --root <raíz> --mode
 ```
 
 ### 4. Validación local del repositorio (`check.py`)
-Punto de entrada único de verificación (tests + rutas + unicidad de reglas + esquema):
+Punto de entrada único de verificación de release gates (tests + rutas + unicidad de reglas + esquema):
 ```bash
-python3 scripts/check.py --fase PR-6
+python3 scripts/check.py --fase PR-7
 ```
 
 ### 5. Servidor MCP Local sobre stdio (`--serve-mcp`)
@@ -154,33 +163,24 @@ Arranca el servidor Model Context Protocol local para Claude Desktop y clientes 
 python3 skills/arma3-sqf-skill/scripts/sqf_orchestrator.py --serve-mcp
 ```
 Implementación en biblioteca estándar pura (JSON-RPC 2.0 por stdio, sin dependencias externas). Expone las herramientas `sqf_analyze`, `sqf_wiki_query` y `sqf_mode`.
-- **¿Cuándo lo necesitas?**: Para Claude Desktop con ejecución de herramientas locales automáticas.
-- **¿Cuándo NO lo necesitas?**: En Claude Code, Cursor o Antigravity (acceso nativo al repo) o si usas el paquete inline de modo pegado.
-- Documentación completa en [`docs/MCP.md`](docs/MCP.md) y postura de seguridad en [`docs/PRIVACIDAD.md`](docs/PRIVACIDAD.md).
+- Documentación técnica completa en [`docs/MCP.md`](docs/MCP.md) y postura de seguridad en [`docs/PRIVACIDAD.md`](docs/PRIVACIDAD.md).
 
 ---
 
 ## 🚀 Quickstart por Host
 
-La skill está adaptada para operar en 6 entornos principales de IA. Consulta la [Matriz de Compatibilidad y Degradación](docs/COMPATIBILIDAD.md) para conocer las capacidades y protocolos de degradación de cada host. Para el informe de evaluación y el protocolo de reproducción de calidad formal, consulta [docs/QUALITY.md](docs/QUALITY.md) y [docs/SMOKE-RESULTS.md](docs/SMOKE-RESULTS.md).
-
-> [!NOTE]
-> **Estado medido de la evidencia (R4, R5).** El motor determinista local (M1) se verifica al 100 % sobre los goldens deterministas. Las evaluaciones de modelos externos se midieron en **Antigravity** con `gemini-3.8-flash-high` v1.0 (temperatura 0,2):
-> - **Bloque 1 (Señalizado, 14 goldens × 3 repeticiones = 84 trazas):** **M2 (archivo) = 83,3 %** (mín 75,0 %, 4 omisiones; **NO PASA OBJETIVO ≥ 90 %**), **M3 (pegado) = 38/39 (97,4 %), 0 falsos PASA** (**NO PASA OBJETIVO 100 %**).
-> - **Bloque 2 (Ciego / No señalizado, 6 goldens × 3 repeticiones = 36 trazas):** **M2 (archivo) = 100 %** (12/12 en Cat. 3–7), **M3 (pegado) = 21/21 (100 %), 0 falsos PASA**, con honestidad técnica verificada en `b05` (`NO_VERIFICADO` ante whitelist no disponible sin `description.ext`).
-> - **Interpretación honesta:** el modelo detecta de forma fiable el defecto principal de cada fichero (100 % en dataset ciego), pero su *recall* sobre defectos secundarios dentro del mismo fichero es parcial e inconsistente (`g03:L4` 1/3 en archivo y 2/3 en pegado; `g08:L11` 1/3 en archivo y 3/3 en pegado). El Bloque 1 mide **conformidad del informe**, no detección a ciega; el Bloque 2 es el que mide capacidad real de detección.
-> - Las 120 trazas están verificadas por hash de contexto contra los archivos reales del repo (Regla R3; 0 descartadas). El resto de hosts (Claude Code, Claude Desktop, Cursor, Codex, ChatGPT, Gemini) permanece en `NO VERIFICADO`: sin trazas reales no se afirma equivalencia de calidad. Detalle completo en [docs/QUALITY.md](docs/QUALITY.md).
+La skill está adaptada para operar en 6 entornos principales de IA. Consulta la [Matriz de Compatibilidad y Degradación](docs/COMPATIBILIDAD.md) para detalles de cada host y [docs/QUALITY.md](docs/QUALITY.md) para el informe formal de calidad.
 
 | Host | Configuración Rápida | Modo de Operación |
 | :--- | :--- | :--- |
-| **Claude Code** | Inicia `claude` en la raíz del repo. Detecta automáticamente `integrations/claude/CLAUDE.md`. | Modo Archivo Completo |
-| **Claude Desktop** | Pega `integrations/claude/claude_desktop_paste.md` al inicio del chat o configura MCP. | Host Degradado / MCP |
-| **Cursor** | Copia `integrations/cursor/.cursorrules` a la raíz del espacio de trabajo. | Modo Reglas y Archivo |
-| **OpenAI / Codex** | Coloca `integrations/openai/AGENTS.md` como instrucciones de sistema o agente. | Modo CLI / Instrucciones |
-| **ChatGPT Custom GPT** | Pega `integrations/chatgpt/custom_gpt_instructions.md` y sube los 18 archivos del [manifiesto](integrations/chatgpt/knowledge_manifest.md). | Host Degradado (RAG) |
-| **Google Gemini** | Pega `integrations/gemini/system_instruction.md` en System Instructions en AI Studio o API. | Host Degradado (Inline) |
+| **Claude Code** | Inicia `claude` en la raíz del repo. Detecta automáticamente [`integrations/claude/CLAUDE.md`](integrations/claude/CLAUDE.md). | Modo Archivo Completo |
+| **Claude Desktop** | Pega [`integrations/claude/claude_desktop_paste.md`](integrations/claude/claude_desktop_paste.md) al inicio del chat o configura MCP vía [`claude_desktop_config_snippet.json`](integrations/claude/claude_desktop_config_snippet.json). | Host Degradado / MCP |
+| **Cursor** | Copia [`integrations/cursor/.cursorrules`](integrations/cursor/.cursorrules) a la raíz del espacio de trabajo. | Modo Reglas y Archivo |
+| **OpenAI / Codex** | Coloca [`integrations/openai/AGENTS.md`](integrations/openai/AGENTS.md) como instrucciones de sistema o agente. | Modo CLI / Instrucciones |
+| **ChatGPT Custom GPT** | Pega [`integrations/chatgpt/custom_gpt_instructions.md`](integrations/chatgpt/custom_gpt_instructions.md) y sube los 18 archivos del [manifiesto](integrations/chatgpt/knowledge_manifest.md). | Host Degradado (RAG) |
+| **Google Gemini** | Pega [`integrations/gemini/system_instruction.md`](integrations/gemini/system_instruction.md) en System Instructions en AI Studio o API. | Host Degradado (Inline) |
 
-Consulta la guía paso a paso en [INSTALL.md](INSTALL.md). El historial de versiones está en [CHANGELOG.md](CHANGELOG.md).
+Guía de instalación paso a paso en [INSTALL.md](INSTALL.md). Historial de versiones y trazabilidad de cambios en [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
@@ -191,30 +191,28 @@ Consulta la guía detallada de instalación en [INSTALL.md](INSTALL.md).
 ### Requisitos Básicos
 - **Python**: 3.11 o superior.
 - **Host de IA**: Claude Code, Claude Desktop, Cursor, Gemini CLI, Antigravity, OpenAI Codex o Custom GPTs.
-- *(Opcional)* **`sqflint`**: Linter nativo de SQF (`cargo install sqflint`).
+- *(Opcional)* **`sqflint`**: Linter nativo de SQF (`cargo install sqflint`). Si no está presente, la herramienta degrada de forma transparente y honesta a `NO VERIFICADO`.
 
 ### Réplica Offline BIKI y Dataset `a3ref`
-Para validar comandos y funciones offline con exactitud criptográfica, clona `a3ref` y configura `SQF_WIKI_DATA_PATH` (ver [INSTALL.md](INSTALL.md)). Si no se instala, la skill degrada con honestidad técnica a `NO VERIFICADO` en comprobaciones wiki.
+Para validar comandos y funciones offline con exactitud criptográfica, clona `a3ref` y configura `SQF_WIKI_DATA_PATH` (ver [INSTALL.md](INSTALL.md) y [docs/WIKI-DB.md](docs/WIKI-DB.md)). Si no se instala, la skill degrada con honestidad técnica a `NO VERIFICADO` en comprobaciones wiki.
 
 ---
 
 ## 🚫 Lo que NO incluye esta skill
 
-Para garantizar máxima portabilidad, ligereza y neutralidad de anfitrión, esta skill **no incluye**:
-
-1. **El dataset completo offline de `a3ref` ni la base de datos `arma3_wiki.db`**: Se mantienen fuera del repositorio para garantizar máxima ligereza y portabilidad. La base de datos SQLite es opcional, puede construirse localmente en ~1 segundo con `wiki_db_builder.py build` (ver [INSTALL.md](INSTALL.md)) y acelera las consultas hasta 520x. Sin el dataset, el estado degrada con honestidad técnica a `SIN_REPLICA` / `NO VERIFICADO`.
-2. **El binario ejecutable de `sqflint`**: No se empaquetan binarios compilados específicos de plataforma.
-3. **Dependencias de terceros en tiempo de ejecución**: El motor CLI determinista opera exclusivamente sobre la biblioteca estándar de Python (>=3.11). Solo las herramientas de desarrollo (`pytest`, `ruff`, `tiktoken`) requieren instalación adicional.
-4. **Acoplamiento a runtimes multi-agente propietarios**: Diseñada bajo arquitectura en capas (Capa 0 + Lentes bajo demanda) para operar en cualquier LLM moderno sin requerir orquestadores externos.
+1. **El dataset completo offline de `a3ref` ni la base de datos `arma3_wiki.db`**: Se mantienen fuera del repositorio para garantizar ligereza. La base de datos SQLite puede construirse localmente en ~1 segundo con `wiki_db_builder.py build` (acelera búsquedas hasta 520x). Sin el dataset, el estado degrada con honestidad técnica a `SIN_REPLICA` / `NO VERIFICADO`.
+2. **El binario ejecutable de `sqflint`**: No se empaquetan binarios precompilados de plataforma.
+3. **Dependencias de terceros en tiempo de ejecución**: El motor CLI determinista opera exclusivamente sobre la biblioteca estándar de Python (>=3.11).
+4. **Acoplamiento a orquestadores multi-agente cerrados**: Diseñada bajo arquitectura modular y en capas para operar en cualquier LLM moderno.
 
 ---
 
 ## 🧪 Arnés de Pruebas
 
-El repositorio cuenta con una suite integral de 144 pruebas unitarias y de integración que validan escalados, análisis de scope, fallbacks, el bucle de calidad T09 y la trazabilidad de las métricas de evaluación:
+El repositorio cuenta con una suite integral de 145 pruebas automatizadas que validan análisis sintáctico, resolución de enlaces relativos, paridad de agentes, base SQLite y contratos del servidor MCP:
 
 ```bash
-python -m pytest tests/ -v
+python -m pytest tests/ -q
 ```
 
 ---

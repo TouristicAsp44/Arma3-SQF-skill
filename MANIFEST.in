@@ -6,6 +6,7 @@ prune .pytest_cache
 prune __pycache__
 global-exclude *.db *.sqlite *.db-journal *.db-wal
 exclude skills/arma3-sqf-skill/references/wiki-cache.md
+exclude PLAN-IMPROVEMENTS*.md
 
 include README.md
 include INSTALL.md

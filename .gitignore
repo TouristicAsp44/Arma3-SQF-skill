@@ -76,3 +76,8 @@ legacy/
 *.sqlite
 *.db-journal
 *.db-wal
+
+# Archivos de planificacion y proceso descartados (PR-7)
+PLAN-IMPROVEMENTS*.md
+docs/INSTRUCCION-ANTIGRAVITY-PR*.md
+!docs/INSTRUCCION-ANTIGRAVITY-PR7.md

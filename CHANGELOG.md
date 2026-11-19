@@ -31,7 +31,7 @@ Gemini y Antigravity, con `dependencies = []` (solo biblioteca estándar de Pyth
   denominadores separados y sección de *bloqueantes no declarados*.
 - **Métricas R4 (MÉTRICA + MÉTODO + ESTADO)**: M1 (script, 100 %), M2 (modelo en modo archivo,
   objetivo >= 90 %), M3 (modelo en modo pegado, objetivo 100 % y 0 falsos PASA).
-- **Documentación**: `docs/QUALITY.md` (generado), `docs/ESTADO-PR.md`, `docs/PARIDAD.md`,
+- **Documentación**: `docs/QUALITY.md` (generado), `docs/PARIDAD.md`,
   `docs/COMPATIBILIDAD.md`, `docs/MCP.md`, `docs/PRIVACIDAD.md`, `docs/SMOKE-RESULTS.md`.
 - **Suite de 144 tests** y gate por fases `scripts/check.py --fase PR-5 | PR-6 | PR-7`.
 

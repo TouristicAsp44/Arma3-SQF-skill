@@ -6,7 +6,9 @@
 
 **Destinatario:** Antigravity (ejecutor de las fases)
 **Supervisor:** Mavis (auditoría independiente; revisa cada fase y emite la siguiente)
-**Directorio de trabajo:** `C:\Users\Touri\Documents\EDEN EDITOR\Skills Antigravity\arma3-sqf-skill`
+**Directorio de trabajo:** la raíz del repositorio `arma3-sqf-skill` — la carpeta que contiene este
+documento. *(Este documento es material versionado y se publica en GitHub: no escribas aquí
+rutas absolutas de la máquina; usa `<RAÍZ_DEL_REPO>`.)*
 **Repositorio destino:** `https://github.com/TouristicAsp44/Arma3-SQF-skill` (público, nuevo)
 **Fecha de emisión:** 2026-11-19
 **Idioma de todos los entregables:** español
@@ -56,19 +58,46 @@ Estos hechos están **medidos**, no supuestos. Si al ejecutar una fase observas 
   `docs/` con 10 `INSTRUCCION-ANTIGRAVITY-*.md` (~157 KB) + `docs/ESTADO-PR.md` (37 KB).
   `legacy/` (11 ficheros) está congelado y fuera de git. `evals/runs/` (120 trazas, 2,7 MB) está
   fuera de git. `.gitignore` y `MANIFEST.in` ya excluyen ambos.
-- **Puntos que contienen rutas del equipo local** (hallados por Mavis): `docs/INSTRUCCION-ANTIGRAVITY-PR6.md`
-  (2 rutas `C:/Users/Touri/...`), y las 10 instrucciones `INSTRUCCION-*` + 6 `PLAN-IMPROVEMENTS*`
-  (rutas `C:\Users\Touri\Documents\EDEN EDITOR\...`).
+- **Puntos que contenían rutas del equipo local** (hallados por Mavis antes de la limpieza):
+  `docs/INSTRUCCION-ANTIGRAVITY-PR6.md` (2 rutas absolutas en su bloque de configuración MCP) y las
+  10 instrucciones `INSTRUCCION-*` + 6 `PLAN-IMPROVEMENTS*` (rutas absolutas de la carpeta de
+  trabajo). Todos ellos borrados en la Fase 2.
 - **URLs que apuntan al repositorio antiguo** `TouristicAsp44/Arma3-SQF-review` (el del plugin
   original, que **no se toca**): `pyproject.toml` (3 URLs), `CONTRIBUTING.md` (1),
   `CHANGELOG.md` (1 enlace de release).
+
+### 1.1 Actualización de estado tras la ejecución de F0–F2 (auditoría de Mavis, 2026-11-19)
+
+Antigravity ya ejecutó las fases iniciales. Estado **verificado** en ese momento:
+
+- **F0 cerrada:** remoto `origin` → `https://github.com/TouristicAsp44/Arma3-SQF-skill.git`.
+- **F1 cerrada:** `main` y el tag `v1.0.0-rc.1` **publicados** (visibles en el remoto). El tag local
+  `v1.0.0` anterior fue sustituido por `v1.0.0-rc.1`. Versión `1.0.0-rc.1` en `pyproject.toml` y
+  `plugin.json`.
+- **F2 cerrada:** los 17 ficheros de residuo están borrados; `evals/harness.py` ya no genera
+  referencias a `docs/ESTADO-PR.md`; `docs/QUALITY.md` regenerado y sincronizado.
+- **F3 cerrada (aparentemente):** el README ya lleva H1 con el nombre del proyecto, sección de
+  procedencia y tabla de diferencias Skill vs Plugin.
+- **Batería en verde tras la limpieza:** `pytest` → **145 passed**; `check.py --fase PR-5 | PR-6 |
+  PR-7` → todo verde; `ruff` → All checks passed; `harness --check` → OK; inline → OK.
+- **Pendiente:** F4 (localidad, con el hallazgo abierto F4.6) y F5 (release `1.0.0` final).
+
+**Discrepancias menores a corregir en F5** (no son fallos de gate, pero dejadas por el camino):
+
+1. El README declara *"Versión estable `1.0.0`"* y su badge enlaza a la release `v1.0.0`, que
+   **aún no existe**: la versión real del paquete es `1.0.0-rc.1`. Alinear ambos con la versión
+   que se publique en F5.
+2. `CHANGELOG.md` dice *"Suite de 144 tests"*; la cifra real es **145**.
+3. El CHANGELOG menciona `docs/ESTADO-PR.md` en el encabezado de la sección de trazabilidad
+   migrada: es una mención histórica, no un enlace roto. **No** es necesario corregirla, pero
+   tampoco debe presentarse como documento existente.
 
 ---
 
 ## 2. Reglas duras (no negociables)
 
-1. **No tocar** `C:\Users\Touri\Documents\EDEN EDITOR\Skills Antigravity\arma3-sqf-review\` (el
-   plugin original): es solo lectura. Todo el trabajo ocurre en `arma3-sqf-skill`.
+1. **No tocar** el repositorio hermano `arma3-sqf-review` (el plugin original, solo lectura):
+   todo el trabajo ocurre en `arma3-sqf-skill`.
 2. **No maquillar métricas.** `evals/goldens/*/expected.json` es contrato: cambiar un valor
    esperado cambia el contrato y **requiere aprobación explícita del usuario**. No se toca.
 3. **Honestidad técnica:** lo no ejecutado = `NO VERIFICADO`. Prohibido inventar modelos, métricas,
@@ -98,7 +127,7 @@ Estos hechos están **medidos**, no supuestos. Si al ejecutar una fase observas 
 
 - F0.1 Ejecutar la línea base completa y pegar la salida literal en el informe de fase:
   ```powershell
-  Set-Location 'C:\Users\Touri\Documents\EDEN EDITOR\Skills Antigravity\arma3-sqf-skill'
+  Set-Location '<RAÍZ_DEL_REPO>'   # la carpeta que contiene este documento
   python -m pytest tests/ -q
   python scripts/check.py --fase PR-5
   python scripts/check.py --fase PR-6
@@ -307,9 +336,9 @@ rutas relativas al repositorio.
                  -Pattern 'C:\\Users\\','C:/Users/','/Users/','EDEN EDITOR','a3ref','\.a3ref'
   ```
   Clasifica cada hallazgo en una de estas categorías:
-  1. **Ruta del equipo local → corregir.** Ejemplos confirmados:
-     `docs/INSTRUCCION-ANTIGRAVITY-PR6.md` (líneas 60–61: `cwd` y `SQF_WIKI_DB_PATH` con
-     `C:/Users/Touri/...`). Tras la Fase 2 ese fichero ya no existe, pero el patrón puede
+  1. **Ruta del equipo local → corregir.** Caso confirmado antes de la limpieza:
+     `docs/INSTRUCCION-ANTIGRAVITY-PR6.md` (líneas 60–61: `cwd` y `SQF_WIKI_DB_PATH` con una ruta
+     absoluta de la máquina). Ese fichero ya no existe tras la Fase 2, pero el patrón puede
      repetirse en `docs/MCP.md`, `docs/WIKI-DB.md`, `INSTALL.md`, `integrations/**` y
      `skills/arma3-sqf-skill/scripts/**`.
   2. **Referencia al dataset público `a3ref` → es legítima, pero debe ser neutra.** El dataset
@@ -340,6 +369,15 @@ rutas relativas al repositorio.
 - F4.5 **Documentos de wiki** (`docs/WIKI-DB.md`, `docs/MCP.md`): los ejemplos de comando deben
   usar `~`/variables de entorno y declarar explícitamente que son opcionales; si la réplica no
   está, el estado es `SIN_REPLICA` / `NO VERIFICADO`.
+- F4.6 **Hallazgo abierto de Mavis (auditoría posterior a la Fase 2):** el test de localidad es
+  *case-sensitive*, por lo que hay material versionado que escapa al barrido:
+  `skills/arma3-sqf-skill/references/diferencial-misiones-addons.md` usa el nombre propio del
+  entorno de trabajo del autor (`Eden Editor`, con distinta capitalización) en el `description`
+  de su frontmatter, dentro de un fichero que es material **distribuible**. Para una skill
+  universal, ese nombre no debe aparecer: neutralízalo (por ejemplo, "misiones en un proyecto
+  propio" vs "addons empaquetados") y ajusta el test para que detecte la variante con y sin
+  mayúsculas (`re.IGNORECASE`), **sin** autoexcluir ese fichero. Verifica que el test sigue
+  detectando el patrón (prueba negativa: reintroduce la cadena y comprueba que falla).
 
 **Criterios de aceptación**
 - [ ] Cero apariciones de `C:\Users\`, `C:/Users/`, `/Users/`, `EDEN EDITOR` en ficheros
@@ -347,6 +385,8 @@ rutas relativas al repositorio.
 - [ ] El test de localidad nuevo está en verde y **no** es tautológico (debe fallar si se
       reintroduce una ruta absoluta: verifícalo introduciendo una y revirtiéndola).
 - [ ] El runtime sigue funcionando: `pytest` en verde y `harness --check` OK.
+- [ ] F4.6 cerrado: cero referencias al nombre propio del entorno del autor en material
+      distribuible, y el test lo detecta con independencia de las mayúsculas.
 
 ---
 

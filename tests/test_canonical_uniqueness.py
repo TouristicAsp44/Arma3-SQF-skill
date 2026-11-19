@@ -53,7 +53,6 @@ def _iter_repo_files() -> list[Path]:
             for f in files
             if not any(part in EXCLUDED_DIRS for part in f.relative_to(REPO_ROOT).parts)
             and f.name not in {"PARIDAD.md", "QUALITY.md"}
-            and not f.name.startswith("PLAN-IMPROVEMENTS")
         }
     )
 
