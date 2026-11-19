@@ -17,10 +17,8 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 # Ficheros que describen la HISTORIA del port y pueden citar el nombre antiguo.
 HISTORY_ALLOWED = (
-    "docs/INSTRUCCION-ANTIGRAVITY-",
-    "docs/ESTADO-PR.md",
+    "docs/INSTRUCCION-ANTIGRAVITY-PR7.md",
     "docs/PARIDAD.md",
-    "PLAN-IMPROVEMENTS",
 )
 
 # Material que se distribuye al usuario final.
@@ -115,3 +113,32 @@ def test_no_legacy_skill_path_in_distributed_files() -> None:
 def test_legacy_skill_path_does_not_exist_in_repo() -> None:
     """El directorio renombrado no debe existir: si vuelve a aparecer, el port esta mezclado."""
     assert not (REPO_ROOT / "skills" / "arma3-sqf-review").exists()
+
+
+def test_markdown_relative_links_resolve_to_existing_files() -> None:
+    """Todos los enlaces relativos en ficheros Markdown deben resolver a ficheros existentes (R3)."""
+    import re
+
+    link_re = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
+    broken: list[str] = []
+    excluded = {"legacy", ".git", "build", "dist", "__pycache__", ".pytest_cache", "evals/runs"}
+
+    for md_path in REPO_ROOT.rglob("*.md"):
+        if any(part in excluded for part in md_path.parts):
+            continue
+        try:
+            text = md_path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            continue
+        for m in link_re.finditer(text):
+            target = m.group(2).strip()
+            if target.startswith(("http://", "https://", "mailto:", "#")):
+                continue
+            clean_target = target.split("#")[0].strip()
+            if not clean_target:
+                continue
+            resolved = (md_path.parent / clean_target).resolve()
+            if not resolved.exists():
+                broken.append(f"{md_path.relative_to(REPO_ROOT).as_posix()} -> '{target}'")
+
+    assert not broken, "Enlaces Markdown relativos rotos: " + ", ".join(broken)

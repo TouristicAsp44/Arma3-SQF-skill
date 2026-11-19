@@ -59,6 +59,22 @@ Gemini y Antigravity, con `dependencies = []` (solo biblioteca estándar de Pyth
 - 120 trazas reproducibles, 0 descartadas por hash de contexto (R3).
 - 6 hosts sin ejecución real permanecen en `NO VERIFICADO`: sin trazas no se afirma "misma
   calidad" que el plugin original (Regla R5).
+- **Ground truth honesto**: se declararon defectos secundarios reales en `g03` (L4) y `g08` (L11),
+  y se ajustaron líneas en `b06`. Esto evidenció que el modelo detecta el 100 % del defecto principal
+  en código ciego, pero su exhaustividad en defectos secundarios es parcial (caída de M2 a 83,3 %).
+- **Arnés de evaluación**: clasificación de disciplinas por raíces de token NFKD y regla estricta de
+  modo pegado para configuraciones ausentes (honestidad técnica ante `b05_remoteexec`).
+
+### Trazabilidad y resultados por fase (histórico migrado de `ESTADO-PR.md`)
+
+- **PR-1 (Saneamiento del repositorio):** Renombrado canónico a `arma3-sqf-skill`, anclas `CANON:*` en `references/invariants.md`, esquema de informe v1, test de rutas absolutas y CI en Python 3.11/3.12/3.13.
+- **PR-2 (Núcleo portable):** Frontmatter bilingüe (184/250 tokens), Capa 0 de `SKILL.md` (1.186/1.200 tokens), 6 lentes con delimitadores `AUTHORED`/`CANON-EXTRACT`, 5 workflows y unicidad N3 (`test_canonical_uniqueness.py`). Gate PR-2 en verde.
+- **PR-3 (Base de conocimiento SQLite):** Constructor determinista `wiki_db_builder.py` con FTS5 y degradación a `LIKE`. Lookup 130x más rápido y `get_topic` 523x más rápido sobre réplica completa de 35,4 MB. Preservación estricta de procedencia (`revid`, `dataset_sha`). Gate PR-3 en verde.
+- **PR-4 (Matriz de compatibilidad y adaptadores):** Adaptadores para Claude, Cursor, OpenAI/Codex, ChatGPT y Gemini. Paquetes inline P1–P4 deterministas (<= 8.000 chars). Smoke tests S1–S3 con 0 falsos PASA. Gate PR-4 en verde.
+- **PR-5 y PR-5-bis (Evals formales y arnés de evaluación):** 14 goldens señalizados (`g01`–`g13`), 84 trazas reproducibles (14 x 2 x 3) con hash de contexto SHA-256 (0 descartadas). Corrección de falsos fallos del arnés por subcadena en clasificación de disciplinas. Gate PR-5 en verde.
+- **Track C (Goldens ciegos y corrección de ground truth):** Creación de 6 goldens no señalizados (`b01`–`b06`) y 36 trazas (6 x 2 x 3). Corrección honesta del ground truth (`g03`, `g08`, `b06`) para penalizar omisiones de defectos secundarios: M2 Bloque 1 ajustado a 83,3 % (mín 75,0 %, 4 omisiones) y M3 a 38/39 (97,4 %, 1 omisión); Bloque 2 M2 al 100 % y M3 21/21 (100 %). Clasificador de bloqueantes fuera de alcance no cuenta como falsos positivos.
+- **PR-6 (Servidor MCP stdio):** Servidor JSON-RPC 2.0 en stdlib puro (`scripts/mcp_server.py`) con `sqf_analyze`, `sqf_wiki_query` y `sqf_mode`. Flag `--serve-mcp` en el CLI. UTF-8 estricto forzado en `stdio` para Windows y expansión de `~` (`expanduser`). Gate PR-6 en verde (18 checks).
+- **PR-7 (Paridad de agentes y publicación):** Auditoría ejecutable de los 11 agentes del plugin original en `docs/PARIDAD.md` y `tests/test_agent_port_parity.py`. Conservación de `agents/` para Antigravity y exclusión de `legacy/` fuera de git. 144 tests en verde en suites PR-5/PR-6/PR-7.
 
 ### Notas
 

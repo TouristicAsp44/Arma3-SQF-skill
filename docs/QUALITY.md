@@ -1,5 +1,5 @@
 <!-- GENERATED FROM: evals/harness.py | DO NOT EDIT -->
-<!-- SOURCE-HASH: 95741923d260e6f425c87c68f9eebd75e06afa631863d0e42029e4c229d89f2a -->
+<!-- SOURCE-HASH: 707713f8aaa65cf2ab9f2980d589263d290210e882458de9891bf009f4e59590 -->
 
 # Informe Formal de Calidad y Métricas de Evaluación — `arma3-sqf-skill`
 
@@ -69,7 +69,7 @@ Una métrica que no alcanza su objetivo se marca como `NO PASA OBJETIVO` con el 
 
 Trazabilidad del contexto (R3): cada traza declara el `sha256` de los ficheros que cargó. El harness lo recalcula contra los ficheros actuales del repo (con saltos de línea normalizados a LF) y **descarta la traza si el hash no coincide**, por no ser reproducible. En esta ejecución: 0 traza(s) descartada(s) por contexto no reproducible o ausente.
 
-**Evidencia de linter y trazabilidad histórica (Parte C.3):** 8 trazas del dataset histórico señalizado contienen en su respuesta cruda menciones a rutas del plugin original (`arma3-sqf-review`). Esta limitación está documentada en `docs/ESTADO-PR.md`; las métricas semánticas M2/M3 no dependen de la salida del linter determinista, y las 36 trazas del dataset no señalizado están 100 % libres de rutas heredadas.
+**Evidencia de linter y trazabilidad histórica (Parte C.3):** 8 trazas del dataset histórico señalizado contienen en su respuesta cruda menciones a rutas del plugin original (`arma3-sqf-review`). Esta limitación está documentada en `CHANGELOG.md` (y en esta misma sección); las métricas semánticas M2/M3 no dependen de la salida del linter determinista, y las 36 trazas del dataset no señalizado están 100 % libres de rutas heredadas.
 
 **Alcance de la evidencia:** las métricas solo son publicables como afirmación de calidad para los hosts efectivamente medidos y con la cobertura indicada. Los hosts sin trazas permanecen en `NO VERIFICADO` y no admiten afirmación de equivalencia.
 
@@ -97,4 +97,4 @@ El arnés empareja cada bloqueante emitido con los hallazgos declarados en `expe
 
 - **Dataset señalizado · modo archivo**: `g01_syntax_scope:L6(Scope)`, `g01_syntax_scope:L6(Scope)`, `g01_syntax_scope:L6(Scope)`
 
-Los casos concretos y su análisis están en `docs/ESTADO-PR.md` (sección Track C). La cifra es reproducible: `python evals/harness.py --write`.
+Los casos concretos y su análisis están documentados en `CHANGELOG.md` (sección de evidencia y trazabilidad). La cifra es reproducible: `python evals/harness.py --write`.

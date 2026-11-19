@@ -56,7 +56,7 @@ arma3-sqf-skill/
 ├── docs/
 │   ├── COMPATIBILIDAD.md                     <- Matriz de compatibilidad y degradación
 │   ├── PARIDAD.md                            <- Matriz de paridad de migración
-│   └── ESTADO-PR.md                          <- Estado de avance por PR
+│   └── QUALITY.md                            <- Evidencia y métricas de calidad
 └── tests/                                    <- Suite de pruebas deterministas
 ```
 

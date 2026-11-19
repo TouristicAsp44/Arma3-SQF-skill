@@ -1,4 +1,8 @@
-# INSTRUCCIÓN PARA ANTIGRAVITY — PR-7: Publicación de `arma3-sqf-skill` en GitHub
+# INSTRUCCIÓN PARA ANTIGRAVITY — PR-7: Planificación por fases para publicar `arma3-sqf-skill` en GitHub
+
+> **Este documento es la instrucción de planificación.** Define las fases, su orden, las tareas de
+> cada una y los criterios de aceptación. **No** es un informe de resultados: no incluyas aquí
+> salidas de ejecución, solo el plan y sus criterios.
 
 **Destinatario:** Antigravity (ejecutor de las fases)
 **Supervisor:** Mavis (auditoría independiente; revisa cada fase y emite la siguiente)
@@ -230,7 +234,7 @@ usar la skill (decisión del usuario: **borrar del directorio de trabajo**).
   si no está (ya lo está: verificar).
 
 **Criterios de aceptación**
-- [ ] Los 17 ficheros borrados; recuperables; **este documento (`PR7`) intacto**.
+- [ ] Los 17 ficheros borrados; recuperables; **este documento (`INSTRUCCION-ANTIGRAVITY-PR7.md`) intacto**.
 - [ ] `grep`/`Select-String` sin resultados de `ESTADO-PR.md`, `PLAN-IMPROVEMENTS`,
   `INSTRUCCION-ANTIGRAVITY-PR2..PR6PREP`, `BLIND-GOLDENS`, `PARIDAD-AGENTES` en ficheros vivos.
 - [ ] `python evals/harness.py --write` regenera `docs/QUALITY.md` **sin** referencias a ficheros

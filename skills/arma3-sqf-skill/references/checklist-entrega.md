@@ -85,4 +85,4 @@ Cada punto de control debe evaluarse de forma determinista y honesta bajo uno de
 
 ## 3. Sección Diferencial: Misiones (Eden) vs Addons (Mods)
 
-> Para criterios específicos según el tipo de proyecto, consultar [diferencial-misiones-addons.md](file:///skills/arma3-sqf-skill/references/diferencial-misiones-addons.md).
+> Para criterios específicos según el tipo de proyecto, consultar [diferencial-misiones-addons.md](diferencial-misiones-addons.md).

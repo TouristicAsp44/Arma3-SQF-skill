@@ -67,4 +67,4 @@ documento y no se deduce de esta tabla: solo hay evidencia de ejecución en el h
   dentro del mismo fichero es parcial e inconsistente (`g03:L4` 1/3 en archivo y 2/3 en pegado;
   `g08:L11` 1/3 en archivo y 3/3 en pegado). Por eso M2 en modo archivo (83,3 %) y M3 (97,4 %)
   quedan por debajo de sus objetivos y se publican como `NO PASA OBJETIVO`, no como FAIL del producto:
-  el límite es de exhaustividad del modelo, no de la skill. Detalle en `docs/ESTADO-PR.md` (Track C).
+  el límite es de exhaustividad del modelo, no de la skill. Detalle en [`docs/QUALITY.md`](QUALITY.md) (§5 y §6) y en `CHANGELOG.md`.

@@ -942,7 +942,7 @@ def generate_quality_markdown(
         "",
         f"**Evidencia de linter y trazabilidad histórica (Parte C.3):** {stale_count} trazas del dataset "
         "histórico señalizado contienen en su respuesta cruda menciones a rutas del plugin original "
-        "(`arma3-sqf-review`). Esta limitación está documentada en `docs/ESTADO-PR.md`; las métricas "
+        "(`arma3-sqf-review`). Esta limitación está documentada en `CHANGELOG.md` (y en esta misma sección); las métricas "
         "semánticas M2/M3 no dependen de la salida del linter determinista, y las 36 trazas del dataset "
         "no señalizado están 100 % libres de rutas heredadas.",
         "",
@@ -985,7 +985,7 @@ def generate_quality_markdown(
         "",
         *( [f"- **{label}**: " + ", ".join(f"`{x}`" for x in items) for label, items in undeclared_items] or ["- Sin bloqueantes no declarados."] ),
         "",
-        "Los casos concretos y su análisis están en `docs/ESTADO-PR.md` (sección Track C). "
+        "Los casos concretos y su análisis están documentados en `CHANGELOG.md` (sección de evidencia y trazabilidad). "
         "La cifra es reproducible: `python evals/harness.py --write`.",
     ]
 
