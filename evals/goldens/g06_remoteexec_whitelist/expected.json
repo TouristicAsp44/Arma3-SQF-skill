@@ -1,0 +1,18 @@
+{
+  "golden_id": "g06_remoteexec_whitelist",
+  "descripcion": "remoteExec hacia función no declarada en CfgRemoteExec whitelist con mode = 1",
+  "categoria_principal": 5,
+  "bloqueantes_esperados": 1,
+  "sugerencias_esperadas": 0,
+  "hallazgos": [
+    {
+      "categoria": 5,
+      "archivo": "code.sqf",
+      "linea": 4,
+      "severidad": "BLOQUEANTE",
+      "disciplina": "Configuración / Red",
+      "descripcion": "remoteExec hacia fnc_unauthorizedRemote no autorizada en CfgRemoteExec (mode = 1)",
+      "verificable_en": ["archivo"]
+    }
+  ]
+}

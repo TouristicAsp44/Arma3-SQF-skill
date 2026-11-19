@@ -1,0 +1,29 @@
+{
+  "golden_id": "b06_dependencia",
+  "descripcion": "Invocacion de funcion CBA_fnc_* en proyecto configurado como CBA: no en su cabecera",
+  "categoria_principal": 7,
+  "señalizado": false,
+  "determinista": false,
+  "bloqueantes_esperados": 2,
+  "sugerencias_esperadas": 0,
+  "hallazgos": [
+    {
+      "categoria": 7,
+      "archivo": "code.sqf",
+      "linea": 9,
+      "severidad": "BLOQUEANTE",
+      "disciplina": "Dependencias de Framework",
+      "descripcion": "Uso de 'CBA_fnc_hashCreate' en proyecto con perfil CBA: no",
+      "verificable_en": ["archivo", "pegado"]
+    },
+    {
+      "categoria": 7,
+      "archivo": "code.sqf",
+      "linea": 10,
+      "severidad": "BLOQUEANTE",
+      "disciplina": "Dependencias de Framework",
+      "descripcion": "Uso de 'CBA_fnc_hashSet' en proyecto con perfil CBA: no",
+      "verificable_en": ["archivo", "pegado"]
+    }
+  ]
+}

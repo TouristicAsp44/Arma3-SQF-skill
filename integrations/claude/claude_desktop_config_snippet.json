@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "arma3-sqf-windows": {
+      "command": "python",
+      "args": [
+        "skills/arma3-sqf-skill/scripts/sqf_orchestrator.py",
+        "--serve-mcp"
+      ],
+      "cwd": "RUTA_A_TU_PROYECTO",
+      "env": {
+        "SQF_WIKI_DATA_PATH": "~/.a3ref/data",
+        "SQF_WIKI_DB_PATH": "~/.a3ref/arma3_wiki.db"
+      }
+    },
+    "arma3-sqf-posix": {
+      "command": "python3",
+      "args": [
+        "skills/arma3-sqf-skill/scripts/sqf_orchestrator.py",
+        "--serve-mcp"
+      ],
+      "cwd": "RUTA_A_TU_PROYECTO",
+      "env": {
+        "SQF_WIKI_DATA_PATH": "~/.a3ref/data",
+        "SQF_WIKI_DB_PATH": "~/.a3ref/arma3_wiki.db"
+      }
+    }
+  }
+}

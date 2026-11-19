@@ -1,0 +1,20 @@
+{
+  "golden_id": "b02_softlock",
+  "descripcion": "waitUntil condicional sobre variable sin timeout ni salida garantizada",
+  "categoria_principal": 2,
+  "señalizado": false,
+  "determinista": false,
+  "bloqueantes_esperados": 1,
+  "sugerencias_esperadas": 0,
+  "hallazgos": [
+    {
+      "categoria": 2,
+      "archivo": "code.sqf",
+      "linea": 3,
+      "severidad": "BLOQUEANTE",
+      "disciplina": "Softlocks e Init",
+      "descripcion": "waitUntil sin timeout ni condicion de salida garantizada",
+      "verificable_en": ["archivo", "pegado"]
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "golden_id": "g04_dedicated_ui",
+  "descripcion": "Comando UI (hint) en ruta de servidor con guarda hasInterface",
+  "categoria_principal": 3,
+  "bloqueantes_esperados": 1,
+  "sugerencias_esperadas": 0,
+  "hallazgos": [
+    {
+      "categoria": 3,
+      "archivo": "code.sqf",
+      "linea": 4,
+      "severidad": "BLOQUEANTE",
+      "disciplina": "Locality / Dedicado",
+      "descripcion": "Comando de UI (hint) en ruta de servidor; la guarda if (hasInterface) no lo legitima",
+      "verificable_en": ["archivo", "pegado"]
+    }
+  ]
+}

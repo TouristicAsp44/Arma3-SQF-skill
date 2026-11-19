@@ -1,0 +1,400 @@
+{
+  "updated": "2026-11-04T21:31:31Z",
+  "source": "a3ref",
+  "count": 3,
+  "items": [
+    {
+      "name": "addPublicVariableEventHandler",
+      "title": "addPublicVariableEventHandler",
+      "type": "command",
+      "url": "https://community.bistudio.com/wiki/addPublicVariableEventHandler",
+      "revid": 376526,
+      "updated": "2025-10-24T10:02:40Z",
+      "groups": [
+        "Broken Commands",
+        "Event Handlers",
+        "Multiplayer",
+        "Variables"
+      ],
+      "status": "broken",
+      "replaced_by": [
+        "remoteExec",
+        "remoteExecCall"
+      ],
+      "games": {
+        "arma1": "1.09",
+        "arma2": "1.00",
+        "arma2oa": "1.50",
+        "tkoh": "1.00",
+        "arma3": "0.50"
+      },
+      "since": "arma1 1.09",
+      "arma3_since": "0.50",
+      "locality": {
+        "argument": "global",
+        "effect": "local"
+      },
+      "description": "> [!NOTE]\n> This command is deprecated since Arma 3 v1.52 and the introduction of remoteExec and remoteExecCall.\n\nThis event handler will detect if a missionNamespace variable (it is attached to) has been broadcast over network with publicVariable, publicVariableClient or publicVariableServer commands and will execute EH code upon detection.\n\n> [!NOTE]\n> - This EH works **only** in Multiplayer environment\n> - There is **no way** to remove this EH\n> - This EH will not fire on the machine that executed broadcast with publicVariable command, only on the machines that receive the broadcast\n> - The value of broadcast variable can be exactly the same, it is the actual broadcast that triggers EH not the change in variable",
+      "syntaxes": [
+        {
+          "syntax": "varName addPublicVariableEventHandler code",
+          "params": [
+            {
+              "name": "varName",
+              "type": "String",
+              "description": "missionNamespace variable name",
+              "type_expr": "String"
+            },
+            {
+              "name": "code",
+              "type": "Code",
+              "description": "by default, the code is executed in missionNamespace. `_this` arguments array is in format [varName, value, target]:\n\n- varName: String - broadcast variable name (same variable name EH is attached to)\n- value: Anything - broadcast variable value\n- target: Object or Group - target the variable got set on with setVariable (see Alternative Syntax)",
+              "type_expr": "Code"
+            }
+          ],
+          "returns": {
+            "type": "Nothing",
+            "type_expr": "Nothing"
+          },
+          "form": "binary",
+          "left": {
+            "text": "varName"
+          },
+          "right": {
+            "text": "code"
+          }
+        },
+        {
+          "syntax": "varName addPublicVariableEventHandler [target, code]",
+          "since": "arma3 1.46",
+          "params": [
+            {
+              "name": "varName",
+              "type": "String",
+              "description": "name of the variable set on target with setVariable",
+              "type_expr": "String"
+            },
+            {
+              "name": "target",
+              "type": "Object, Group or Team Member",
+              "type_expr": "Object | Group | Team Member"
+            },
+            {
+              "name": "code",
+              "type": "Code",
+              "type_expr": "Code"
+            }
+          ],
+          "returns": {
+            "type": "Nothing",
+            "type_expr": "Nothing"
+          },
+          "form": "binary",
+          "left": {
+            "text": "varName"
+          },
+          "right": {
+            "text": "[target, code]"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "text": "```sqf\n\"publicThis\" addPublicVariableEventHandler {\n    _varName = _this select 0;\n    _value = _this select 1;\n    _target = _this select 2;\n    hint format [\"%1 has been updated to %2 for %3\", _varName, _value, target];\n};\n```",
+          "code": [
+            "\"publicThis\" addPublicVariableEventHandler {\n\t_varName = _this select 0;\n\t_value = _this select 1;\n\t_target = _this select 2;\n\thint format [\"%1 has been updated to %2 for %3\", _varName, _value, target];\n};"
+          ]
+        },
+        {
+          "text": "Client:\n\n```sqf\n\"'^:)123BURP,+=lol\" addPublicVariableEventHandler {hint (\"NUTS are \" + (_this select 1))};\n```\n\nServer:\n\n```sqf\nmissionNamespace setVariable [\"'^:)123BURP,+=lol\", \"craZZZZy\"];\npublicVariable \"'^:)123BURP,+=lol\";\n```",
+          "code": [
+            "\"'^:)123BURP,+=lol\" addPublicVariableEventHandler {hint (\"NUTS are \" + (_this select 1))};",
+            "missionNamespace setVariable [\"'^:)123BURP,+=lol\", \"craZZZZy\"];\npublicVariable \"'^:)123BURP,+=lol\";"
+          ]
+        }
+      ],
+      "problems": "> [!WARNING]\n> The Alternative Syntax does not work as intended.",
+      "see_also": [
+        "publicVariable",
+        "publicVariableClient",
+        "publicVariableServer"
+      ],
+      "notes": [
+        {
+          "user": "TeRp",
+          "date": "2007-12-22T13:30:00Z",
+          "text": "Please note that varName indicates which variable you want to monitor with this eventhandler.\nAs a result, the example eventhandler on this page will only fire when the variable publicThis has been changed,\nbut not if any other variable was changed by any other client via the publicVariable command."
+        },
+        {
+          "user": "MulleDK13",
+          "date": "2014-02-27T00:57:00Z",
+          "text": "Note on using addPublicVariableEventHandler during initialization: If you need a function to call addPublicVariableEventHandler during initialization, you must use postInit. addPublicVariableEventHandler does not work during preInit."
+        },
+        {
+          "user": "Killzone_Kid",
+          "date": "2014-02-27T08:40:00Z",
+          "text": "MulleDK13's note above needs some clarification. You don't \"must\" use postInit and you absolutely can use preInit function to initialise addPublicVariableEventHandler if you start scheduled script from it.\n\n```sqf\n// script with preInit = 1; in CfgFunctions\n0 spawn {\n    \"someVar\" addPublicVariableEventHandler {\n        // yourcode\n    };\n};\n```"
+        },
+        {
+          "user": "SilentSpike",
+          "date": "2015-11-23T21:36:00Z",
+          "text": "While it is true that the event handler will only fire on the machine receiving the broadcast value, please note that this machine can actually be the same machine broadcasting it in the cases of publicVariableClient and publicVariableServer.\n\nExamples:\n\n```sqf\nif (isServer) then\n{\n    \"OnServer\" addPublicVariableEventHandler { hint \"This event handler still fired!\"; };\n    publicVariableServer \"OnServer\";\n};\n```\n\n```sqf\n// This example assumes the client knows their own client ID\n// It does also work on the server (when the server ID is used) irrespective of the command name\n\n\"OnClient\" addPublicVariableEventHandler { hint \"This event handler still fired!\"; };\nclientID publicVariableClient \"OnClient\";\n```"
+        }
+      ]
+    },
+    {
+      "name": "isDedicated",
+      "title": "isDedicated",
+      "type": "command",
+      "url": "https://community.bistudio.com/wiki/isDedicated",
+      "revid": 337566,
+      "updated": "2023-02-10T01:14:00Z",
+      "groups": [
+        "Multiplayer"
+      ],
+      "status": "ok",
+      "games": {
+        "arma2": "1.00",
+        "arma2oa": "1.50",
+        "tkoh": "1.00",
+        "arma3": "0.50"
+      },
+      "since": "arma2 1.00",
+      "arma3_since": "0.50",
+      "description": "Returns true if the machine executing the command is a dedicated multiplayer server. Returns false in single player.",
+      "syntaxes": [
+        {
+          "syntax": "isDedicated",
+          "params": [],
+          "returns": {
+            "type": "Boolean",
+            "type_expr": "Boolean"
+          },
+          "form": "nullary"
+        }
+      ],
+      "examples": [
+        {
+          "code": [
+            "if (isDedicated) then { diag_log \"Dedicated Server on the run !\"; };"
+          ]
+        }
+      ],
+      "see_also": [
+        "isServer",
+        "hasInterface"
+      ],
+      "notes": [
+        {
+          "user": "Killzone_Kid",
+          "date": "2014-12-21T14:54:00Z",
+          "text": "```sqf\nif (isDedicated) then {\n    // run on dedicated server only\n};\n\nif (isServer) then {\n    // run on dedicated server or player host\n};\n\nif (hasInterface) then {\n    // run on all player clients incl. player host\n};\n\nif (!isDedicated) then {\n    // run on all player clients incl. player host and headless clients\n};\n\nif (!isServer) then {\n    // run on all player clients incl. headless clients but not player host\n};\n\nif (!hasInterface) then {\n    // run on headless clients and dedicated server\n};\n\nif (!hasInterface && !isDedicated) then {\n    // run on headless clients only\n};\n```"
+        }
+      ]
+    },
+    {
+      "name": "remoteExec",
+      "title": "remoteExec",
+      "type": "command",
+      "url": "https://community.bistudio.com/wiki/remoteExec",
+      "revid": 379298,
+      "updated": "2026-10-30T23:47:54Z",
+      "groups": [
+        "Multiplayer"
+      ],
+      "status": "ok",
+      "games": {
+        "arma3": "1.50"
+      },
+      "since": "arma3 1.50",
+      "arma3_since": "1.50",
+      "description": "Asks the server to execute the given function or script command on the given target machine(s).\n\n- Functions are executed in the scheduled environment; suspension is allowed.\n- Script commands are executed in the unscheduled environment; suspension is not allowed (see Example 7).\n\nRead Arma 3: Remote Execution for more information about remote execution, security features and JIP techniques.\n\n> [!NOTE]\n> remoteExec/remoteExecCall can be used in single player as well, as it is considered as player-hosted multiplayer.\n\n> [!IMPORTANT]\n> The direct execution of call or spawn via remoteExec (or remoteExecCall) should be avoided to prevent issues in cases where the remote execution of call or spawn is blocked by CfgRemoteExec. It is instead recommended to create a function to be itself remote-executed.\n\n> [!WARNING]\n> The order of persistent remote execution for JIP players is not guaranteed, i.e. the order in which multiple calls are added is not necessarily the order they will be executed for joining player.",
+      "syntaxes": [
+        {
+          "syntax": "params remoteExec [order, targets, JIP]",
+          "params": [
+            {
+              "name": "params",
+              "type": "Anything but Structured Text",
+              "description": "*order*'s parameter\n\n> [!IMPORTANT]\n> Structured Text is **not** meant to be sent over network.",
+              "type_expr": "Anything",
+              "text": "**params**: Anything **but** Structured Text - *order*'s parameter\n\n> [!IMPORTANT]\n> Structured Text is **not** meant to be sent over network."
+            },
+            {
+              "name": "order",
+              "type": "String",
+              "description": "function or command name; while any function or command can be used here, only those allowed by CfgRemoteExec will actually be executed",
+              "type_expr": "String",
+              "text": "**order**: String - function or command name; while any function or command can be used here, only those allowed by CfgRemoteExec will actually be executed"
+            },
+            {
+              "name": "targets",
+              "type": "Number, Object, String, Side, Group or Array",
+              "optional": true,
+              "default": "0",
+              "description": "Number (See also Machine network ID):\n  - **0:** the order will be executed globally, i.e. on the server and every connected client, including the machine where remoteExec originated\n  - **2:** the order will only be executed on the server - is both dedicated and hosted server. See for more info\n  - **Other number:** the order will be executed on the machine where clientOwner matches the given number\n  - **Negative number:** the effect is inverted: **-2** means every client but not the server, **-12** means the server and every client, except for the client where clientOwner returns 12\n- Object - the order will be executed where the given object is local\n- String - interpreted as an Identifier (variable name); the function / command will be executed where the object or group identified by the variable with the provided name is local\n- Side - the order will be executed on machines where the player is on the specified side\n- Group - the order will be executed on machines **where the player is in the specified group** (**not** where said group is local!)\n- Array - array of any combination of the types listed above",
+              "type_expr": "Number | Object | String | Side | Group | Array",
+              "text": "**targets**: Number, Object, String, Side, Group or Array - (Optional, default 0)\n\n- Number (See also Machine network ID):\n  - **0:** the order will be executed globally, i.e. on the server and every connected client, including the machine where remoteExec originated\n  - **2:** the order will only be executed on the server - is both dedicated and hosted server. See for more info\n  - **Other number:** the order will be executed on the machine where clientOwner matches the given number\n  - **Negative number:** the effect is inverted: **-2** means every client but not the server, **-12** means the server and every client, except for the client where clientOwner returns 12\n- Object - the order will be executed where the given object is local\n- String - interpreted as an Identifier (variable name); the function / command will be executed where the object or group identified by the variable with the provided name is local\n- Side - the order will be executed on machines where the player is on the specified side\n- Group - the order will be executed on machines **where the player is in the specified group** (**not** where said group is local!)\n- Array - array of any combination of the types listed above"
+            },
+            {
+              "name": "JIP",
+              "type": "Boolean, String or Object",
+              "optional": true,
+              "default": "false",
+              "description": "Boolean - if true, a unique JIP ID is generated and the remoteExec statement is added to the JIP queue from which it will be executed for every JIP\n- String:\n  - if the string is empty, it is interpreted as false\n  - if the string is in format \"Number:Number\" (e.g. \"0:0\"), it is interpreted as a netId (see below)\n  - else the string is treated as a custom JIP ID and the remoteExec statement is added to the JIP queue, replacing statements that have the same JIP ID\n- Object, Group or netId - the persistent execution of the remoteExec statement is attached to the given object or group, replacing any previous statement that has the same JIP ID.\n  When the object / group is deleted, the remoteExec statement is automatically removed from the JIP queue\n\nThe **JIP** parameter can only be used if the **targets** parameter is 0 or a negative number.\nSee also Example 3 on how to remove statements from the JIP queue.",
+              "type_expr": "Boolean | String | Object",
+              "text": "**JIP**: Boolean, String or Object - (Optional, default false)\n\n- Boolean - if true, a unique JIP ID is generated and the remoteExec statement is added to the JIP queue from which it will be executed for every JIP\n- String:\n  - if the string is empty, it is interpreted as false\n  - if the string is in format \"Number:Number\" (e.g. \"0:0\"), it is interpreted as a netId (see below)\n  - else the string is treated as a custom JIP ID and the remoteExec statement is added to the JIP queue, replacing statements that have the same JIP ID\n- Object, Group or netId - the persistent execution of the remoteExec statement is attached to the given object or group, replacing any previous statement that has the same JIP ID.\n  When the object / group is deleted, the remoteExec statement is automatically removed from the JIP queue\n\nThe **JIP** parameter can only be used if the **targets** parameter is 0 or a negative number.\nSee also Example 3 on how to remove statements from the JIP queue."
+            }
+          ],
+          "returns": {
+            "types": [
+              "Nothing"
+            ],
+            "type_expr": "Nothing | String",
+            "description": "- nil - In case of error. - String - In case of success (see remoteExecutedJIPID). - If the JIP parameter was false or an empty string, the return value is \"\". - If the JIP parameter was true or a custom JIP ID, the JIP ID is returned. - If the JIP parameter was an Object, a Group or a netId, the (corresponding) netId is returned.",
+            "text": "- nil - In case of error.\n- String - In case of success (see remoteExecutedJIPID).\n  - If the **JIP** parameter was false or an empty string, the return value is \"\".\n  - If the **JIP** parameter was true or a custom JIP ID, the JIP ID is returned.\n  - If the **JIP** parameter was an Object, a Group or a netId, the (corresponding) netId is returned."
+          },
+          "form": "binary",
+          "left": {
+            "text": "params"
+          },
+          "right": {
+            "text": "[order, targets, JIP]"
+          }
+        },
+        {
+          "syntax": "remoteExec [functionName, targets, JIP]",
+          "params": [
+            {
+              "name": "functionName",
+              "type": "String",
+              "description": "see the main syntax above for more details.",
+              "type_expr": "String",
+              "text": "**functionName**: String - see the main syntax above for more details."
+            },
+            {
+              "name": "targets",
+              "type": "Number, Object, String, Side, Group or Array",
+              "optional": true,
+              "default": "0",
+              "description": "see the main syntax above for more details.",
+              "type_expr": "Number | Object | String | Side | Group | Array",
+              "text": "**targets**: Number, Object, String, Side, Group or Array - (Optional, default 0) see the main syntax above for more details."
+            },
+            {
+              "name": "JIP",
+              "type": "Boolean, String, Object, Group or netId",
+              "optional": true,
+              "default": "false",
+              "description": "see the main syntax above for more details.",
+              "type_expr": "Boolean | String | Object | Group",
+              "text": "**JIP**: Boolean, String, Object, Group or netId - (Optional, default false) see the main syntax above for more details."
+            }
+          ],
+          "returns": {
+            "type": "nil or String",
+            "type_expr": "Nothing | String",
+            "description": "see the main syntax above for more details."
+          },
+          "form": "unary",
+          "right": {
+            "text": "[functionName, targets, JIP]"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "text": "How to write remoteExec/remoteExecCall with arguments - note the colours:\n\n```\nhint \"Hello\";\n// becomes\n[\"Hello\"] remoteExec [\"hint\"];\n\"Hello\" remoteExec [\"hint\"]; // alternatively\n```\n\n```\nunit1 setFace \"Miller\";\n// becomes\n[unit1, \"Miller\"] remoteExec [\"setFace\"];\n```\n\n```\ncutRsc [\"\", \"BLACK OUT\"];\n// becomes\n[[\"\", \"BLACK OUT\"]] remoteExec [\"cutRsc\"]; // double brackets are needed as the unary command takes an array\n```\n\n```\n// functions, however, do not need double squared brackets\n[\"line 1\", \"line 2\"] spawn BIS_fnc_infoText;\n// becomes\n[\"line 1\", \"line 2\"] remoteExec [\"BIS_fnc_infoText\"];\n```"
+        },
+        {
+          "text": "send an order to specific machines:\n\n```sqf\n\"message\" remoteExec [\"hint\"];                    // sends a hint message to everyone\n\"message\" remoteExec [\"hint\", 0];                // sends a hint message to everyone, identical to \"message\" remoteExec [\"hint\"]\n\"message\" remoteExec [\"hint\", -2];                // sends a hint message to everybody but the server (also not hosted server)\n\"message\" remoteExec [\"hint\", myCar];            // sends a hint message where myCar is local\n\"message\" remoteExec [\"hint\", -clientOwner];    // sends a hint message to everybody but the current machine\n```",
+          "code": [
+            "\"message\" remoteExec [\"hint\"];\t\t\t\t\t// sends a hint message to everyone\n\"message\" remoteExec [\"hint\", 0];\t\t\t\t// sends a hint message to everyone, identical to \"message\" remoteExec [\"hint\"]\n\"message\" remoteExec [\"hint\", -2];\t\t\t\t// sends a hint message to everybody but the server (also not hosted server)\n\"message\" remoteExec [\"hint\", myCar];\t\t\t// sends a hint message where myCar is local\n\"message\" remoteExec [\"hint\", -clientOwner];\t// sends a hint message to everybody but the current machine"
+          ]
+        },
+        {
+          "text": "Add statements to the JIP queue:\n\n```sqf\nprivate _jipId = [\"mission state: the car is broken\"] remoteExec [\"systemChat\", 0, true]; // adds the hint to the JIP queue and returns the JIP queue order id\nwaitUntil { canMove _car };\nremoteExec [\"\", _jipId]; // the systemChat order is removed from the JIP queue\n```\n\n```sqf\n[\"mission state: the car is broken\"] remoteExec [\"systemChat\", 0, _queueObject];\n// ...\nremoteExec [\"\", _queueObject]; // the order attached to _queueObject is removed\n```\n\n```sqf\nprivate _jipId = [\"mission state: the car is broken\"] remoteExec [\"systemChat\", 0, \"MY_JIP_ID\"]; // _jipId is actually \"MY_JIP_ID\" now\nwaitUntil { canMove _car };\n[\"mission state: the car is repaired\"] remoteExec [\"systemChat\", 0, \"MY_JIP_ID\"]; // this order replaces the previous one\n// ...\nremoteExec [\"\", \"MY_JIP_ID\"]; // the \"MY_JIP_ID\" order is removed from the JIP queue\n```",
+          "code": [
+            "private _jipId = [\"mission state: the car is broken\"] remoteExec [\"systemChat\", 0, true]; // adds the hint to the JIP queue and returns the JIP queue order id\nwaitUntil { canMove _car };\nremoteExec [\"\", _jipId]; // the systemChat order is removed from the JIP queue",
+            "[\"mission state: the car is broken\"] remoteExec [\"systemChat\", 0, _queueObject];\n// ...\nremoteExec [\"\", _queueObject]; // the order attached to _queueObject is removed",
+            "private _jipId = [\"mission state: the car is broken\"] remoteExec [\"systemChat\", 0, \"MY_JIP_ID\"]; // _jipId is actually \"MY_JIP_ID\" now\nwaitUntil { canMove _car };\n[\"mission state: the car is repaired\"] remoteExec [\"systemChat\", 0, \"MY_JIP_ID\"]; // this order replaces the previous one\n// ...\nremoteExec [\"\", \"MY_JIP_ID\"]; // the \"MY_JIP_ID\" order is removed from the JIP queue"
+          ]
+        },
+        {
+          "text": "Some more complex examples:\n\n```sqf\n[\"Open\", true] remoteExec [\"BIS_fnc_arsenal\", MyTargetPlayer];\n[MyCurator, [[MyObject1, MyObject2], false]] remoteExec [\"addCuratorEditableObjects\", 2];\n```",
+          "code": [
+            "[\"Open\", true] remoteExec [\"BIS_fnc_arsenal\", MyTargetPlayer];\n[MyCurator, [[MyObject1, MyObject2], false]] remoteExec [\"addCuratorEditableObjects\", 2];"
+          ]
+        },
+        {
+          "text": "A tricky example: executing `player setAmmo [primaryWeapon player, 1];` (on machines where the player is in MyGroup):\n\n```sqf\n[player, [primaryWeapon player, 1]] remoteExec [\"setAmmo\", MyGroup];            // WRONG:    the local player object is used here!\n[{ player setAmmo [primaryWeapon player, 1]; }] remoteExec [\"call\", MyGroup];    // CORRECT:    the remote player object is used here\n```",
+          "code": [
+            "[player, [primaryWeapon player, 1]] remoteExec [\"setAmmo\", MyGroup];\t\t\t// WRONG:\tthe local player object is used here!\n[{ player setAmmo [primaryWeapon player, 1]; }] remoteExec [\"call\", MyGroup];\t// CORRECT:\tthe remote player object is used here"
+          ]
+        },
+        {
+          "text": "**Multiplayer Scripting \"performance trick\"**\nThis `[0, -2] select isDedicated` check is worth it to avoid **function** server-side calculations only. See also Example 9 for an advanced solution.\n\n```sqf\n[\"message\"] remoteExec [\"BIS_fnc_infoText\"];                                // not ideal - the function will still run on the dedicated server for nothing\n[\"message\"] remoteExec [\"BIS_fnc_infoText\", [0, -2] select isDedicated];    // ideal - the dedicated server will not run the code, a player-hosted server will\n\n[\"message\"] remoteExec [\"hint\", [0, -2] select isDedicated];    // the check is too expensive to be worthy - it becomes worthy if the server logs an RPT warning\n[\"message\"] remoteExec [\"hint\"];                                // the (dedicated) server will automatically ditch hint usage due to it not having an interface\n\nprivate _allPlayersTarget = [0, -2] select isDedicated;            // caching the result for multiple usages makes it worthy - think of headless clients as well\n[\"message 1\"] remoteExec [\"hint\", _allPlayersTarget];\n[\"message 2\"] remoteExec [\"hint\", _allPlayersTarget];\n```\n\n> [!NOTE]\n> See Example 9 below for an advanced example.",
+          "code": [
+            "[\"message\"] remoteExec [\"BIS_fnc_infoText\"];\t\t\t\t\t\t\t\t// not ideal - the function will still run on the dedicated server for nothing\n[\"message\"] remoteExec [\"BIS_fnc_infoText\", [0, -2] select isDedicated];\t// ideal - the dedicated server will not run the code, a player-hosted server will\n\n[\"message\"] remoteExec [\"hint\", [0, -2] select isDedicated];\t// the check is too expensive to be worthy - it becomes worthy if the server logs an RPT warning\n[\"message\"] remoteExec [\"hint\"];\t\t\t\t\t\t\t\t// the (dedicated) server will automatically ditch hint usage due to it not having an interface\n\nprivate _allPlayersTarget = [0, -2] select isDedicated;\t\t\t// caching the result for multiple usages makes it worthy - think of headless clients as well\n[\"message 1\"] remoteExec [\"hint\", _allPlayersTarget];\n[\"message 2\"] remoteExec [\"hint\", _allPlayersTarget];"
+          ]
+        },
+        {
+          "text": "As said in the description: **commands** will be executed in an unscheduled environment\n\n```sqf\n[{ sleep 1 }] remoteExec [\"call\"]; // will throw an error: it is forbidden to use sleep (or waitUntil, etc) in unscheduled environment\n```",
+          "code": [
+            "[{ sleep 1 }] remoteExec [\"call\"]; // will throw an error: it is forbidden to use sleep (or waitUntil, etc) in unscheduled environment"
+          ]
+        },
+        {
+          "code": [
+            "\"Message 1\" remoteExec [\"systemChat\"];\n\"Message 2\" remoteExec [\"systemChat\"];\n// will result in\n// \"Message 1\"\n// \"Message 2\"\n// in this exact order on clients"
+          ]
+        },
+        {
+          "text": "It is possible to create a \"to all players\" remote exec target variable:\n\n```sqf\nif (isServer) then\n{\n    TO_ALL_PLAYERS = [0, -2] select isDedicated;\n    publicVariable \"TO_ALL_PLAYERS\";\n};\n```\n\nIf Headless Clients are involved:\n\n```sqf\nif (isServer) then\n{\n    TO_ALL_PLAYERS = [0, -2] select isDedicated;\n\n    private _allNegativeHCs = allPlayers apply { getPlayerID _x } select { _x != \"-1\" }    // all valid playerIDs\n        apply { getUserInfo _x } select { _x select 7 }                                    // filter by HC\n        apply { -(_x select 1) };                                                        // get negative network ID\n\n    if (_allNegativeHCs isNotEqualTo []) then\n    {\n        TO_ALL_PLAYERS = [TO_ALL_PLAYERS] + _allNegativeHCs;\n    };\n\n    publicVariable \"TO_ALL_PLAYERS\";\n\n    addMissionEventHandler [\"OnUserConnected\", {\n        params [\"_networkId\"];\n        private _userInfo = getUserInfo _networkId;\n        if !(_userInfo select 7) exitWith {};    // not a HC\n\n        if (TO_ALL_PLAYERS isEqualType 0) then    // number to array conversion\n        {\n            if (TO_ALL_PLAYERS == 0) then        // player-hosted\n            {\n                TO_ALL_PLAYERS = [-(_userInfo select 1)];\n            }\n            else                                // -2, dedicated server\n            {\n                TO_ALL_PLAYERS = [TO_ALL_PLAYERS, -(_userInfo select 1)];\n            };\n        }\n        else                                    // already an array\n        {\n            TO_ALL_PLAYERS pushBackUnique -(_userInfo select 1);\n        };\n\n        publicVariable \"TO_ALL_PLAYERS\";\n    }];\n};\n```\n\n```sqf\n// client or server will always target the good machines\n[\"Yay!\"] remoteExec [\"hint\", TO_ALL_PLAYERS];\n```",
+          "code": [
+            "if (isServer) then\n{\n\tTO_ALL_PLAYERS = [0, -2] select isDedicated;\n\tpublicVariable \"TO_ALL_PLAYERS\";\n};",
+            "if (isServer) then\n{\n\tTO_ALL_PLAYERS = [0, -2] select isDedicated;\n\n\tprivate _allNegativeHCs = allPlayers apply { getPlayerID _x } select { _x != \"-1\" }\t// all valid playerIDs\n\t\tapply { getUserInfo _x } select { _x select 7 }\t\t\t\t\t\t\t\t\t// filter by HC\n\t\tapply { -(_x select 1) };\t\t\t\t\t\t\t\t\t\t\t\t\t\t// get negative network ID\n\n\tif (_allNegativeHCs isNotEqualTo []) then\n\t{\n\t\tTO_ALL_PLAYERS = [TO_ALL_PLAYERS] + _allNegativeHCs;\n\t};\n\n\tpublicVariable \"TO_ALL_PLAYERS\";\n\n\taddMissionEventHandler [\"OnUserConnected\", {\n\t\tparams [\"_networkId\"];\n\t\tprivate _userInfo = getUserInfo _networkId;\n\t\tif !(_userInfo select 7) exitWith {};\t// not a HC\n\n\t\tif (TO_ALL_PLAYERS isEqualType 0) then\t// number to array conversion\n\t\t{\n\t\t\tif (TO_ALL_PLAYERS == 0) then\t\t// player-hosted\n\t\t\t{\n\t\t\t\tTO_ALL_PLAYERS = [-(_userInfo select 1)];\n\t\t\t}\n\t\t\telse\t\t\t\t\t\t\t\t// -2, dedicated server\n\t\t\t{\n\t\t\t\tTO_ALL_PLAYERS = [TO_ALL_PLAYERS, -(_userInfo select 1)];\n\t\t\t};\n\t\t}\n\t\telse\t\t\t\t\t\t\t\t\t// already an array\n\t\t{\n\t\t\tTO_ALL_PLAYERS pushBackUnique -(_userInfo select 1);\n\t\t};\n\n\t\tpublicVariable \"TO_ALL_PLAYERS\";\n\t}];\n};",
+            "// client or server will always target the good machines\n[\"Yay!\"] remoteExec [\"hint\", TO_ALL_PLAYERS];"
+          ]
+        }
+      ],
+      "multiplayer": "Remote executions are queued and are therefore executed in the same order on remote clients (see Example 8).",
+      "see_also": [
+        "Multiplayer Scripting",
+        "remoteExecCall",
+        "remoteExecutedOwner",
+        "isRemoteExecuted",
+        "isRemoteExecutedJIP",
+        "Arma 3: Remote Execution",
+        "canSuspend",
+        "BIS_fnc_MP",
+        "remoteExecutedJIPID"
+      ],
+      "notes": [
+        {
+          "user": "AgentRev",
+          "date": "2015-12-29T20:28:00Z",
+          "text": "remoteExec and remoteExecCall are currently filtered by BattlEye's remoteexec.txt, the string analyzed by BE is formatted the same way as the following example's output:\n\n```sqf\nformat [\"%1 %2\", functionName, str params]\n```\n\nIf CfgRemoteExec `class Functions` is set to `mode = 1;`, the following remoteexec.txt exclusion can be used to safely allow all whitelisted *_fnc_* functions taking an array as parameter to go through:\n\n```sqf\n!=\"\\w+?_fnc_\\w+? \\[[\\S\\s]*\\]\"\n```\n\nAny attempt to exploit this exclusion using other RE methods like createUnit will run into \"Error Missing ;\" without any malicious code being executed. Mod makers should refrain from remote-executing raw commands from clients, as they require individual exclusions, and instead use *_fnc_* functions taking an array as parameter, which are covered by the above exclusion."
+        },
+        {
+          "user": "Pierre MGI",
+          "date": "2017-01-30T18:35:00Z",
+          "text": "```sqf\n[someArgs] remoteExec ['someCommand', 2, true];\n```\n\nwill fail, as you can't use JIP and remoteExec on server only\n\n```sqf\n[someArgs] remoteExec ['someCommand', 2]; // works\n```"
+        },
+        {
+          "user": "7erra",
+          "date": "2021-03-05T00:48:00Z",
+          "text": "The remoteExec'ed function only has to exist on the target machine. For example:\n\n```sqf\n// initPlayerLocal.sqf\nTAG_fnc_testRemote = {\n    hint \"Remote Exec Received\";\n};\n```\n\n```sqf\n// executed on a DEDICATED server\nremoteExec [\"TAG_fnc_testRemote\", -2];\n```\n\nWill display a hint for every client. This is especially useful for when the server is running a mod that is not required by clients."
+        },
+        {
+          "user": "Sa-Matra",
+          "date": "2024-09-19T08:33:05Z",
+          "text": "It is not possible to use two negative owners to exclude two clients, you'll end up REing all clients:\n\n```sqf\nargs remoteExec [\"func\", [-2, -3]]; // Doesn't work, gonna execute on every client\n```"
+        }
+      ],
+      "categories_extra": [
+        "Arma 3: Remote Execution"
+      ]
+    }
+  ]
+}

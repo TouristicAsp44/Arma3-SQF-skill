@@ -1,0 +1,27 @@
+{
+  "golden_id": "g03_dedicated_player",
+  "descripcion": "Uso de player en script global ejecutable en servidor dedicado",
+  "categoria_principal": 3,
+  "bloqueantes_esperados": 2,
+  "sugerencias_esperadas": 0,
+  "hallazgos": [
+    {
+      "categoria": 3,
+      "archivo": "code.sqf",
+      "linea": 2,
+      "severidad": "BLOQUEANTE",
+      "disciplina": "Locality / Dedicado",
+      "descripcion": "waitUntil {!isNull player} en entorno de servidor dedicado (player es objNull)",
+      "verificable_en": ["archivo", "pegado"]
+    },
+    {
+      "categoria": 3,
+      "archivo": "code.sqf",
+      "linea": 4,
+      "severidad": "BLOQUEANTE",
+      "disciplina": "Locality / Dedicado",
+      "descripcion": "Uso de player en una ruta que corre en servidor dedicado (player es objNull)",
+      "verificable_en": ["archivo", "pegado"]
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "arma3-sqf-skill"
+version = "1.0.0"
+description = "Skill universal de análisis y revisión SQF para Arma 3 — compatible con Claude, ChatGPT, Cursor y cualquier host MCP/OpenAPI"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+authors = [
+    { name = "TouristicAsp44" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/TouristicAsp44/Arma3-SQF-review"
+Repository = "https://github.com/TouristicAsp44/Arma3-SQF-review"
+Issues = "https://github.com/TouristicAsp44/Arma3-SQF-review/issues"
+
+[project.optional-dependencies]
+linter = [
+    "sqflint>=0.3.2",
+]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=5.0.0",
+    "anyio>=4.0.0",
+    "platformdirs>=4.0.0",
+    "ruff>=0.4.0",
+    "sqflint>=0.3.2",
+    "tiktoken>=0.7.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [
+    "skills/arma3-sqf-skill/scripts",
+    "skills/arma3-sqf-skill/references",
+    "."
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501", "E402"]
+
+[tool.mypy]
+python_version = "3.11"
+mypy_path = "skills/arma3-sqf-skill/scripts"
+
+[tool.pyright]
+extraPaths = [
+    "skills/arma3-sqf-skill/scripts",
+    "skills/arma3-sqf-skill/references",
+    "."
+]
+
+[tool.setuptools]
+py-modules = ["sqf_models", "sqf_orchestrator"]
+
+[tool.setuptools.package-dir]
+"" = "skills/arma3-sqf-skill/scripts"

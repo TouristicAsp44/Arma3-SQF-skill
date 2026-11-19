@@ -1,0 +1,20 @@
+{
+  "golden_id": "b03_player_servidor",
+  "descripcion": "Uso de player en rama condicional del servidor",
+  "categoria_principal": 3,
+  "señalizado": false,
+  "determinista": false,
+  "bloqueantes_esperados": 1,
+  "sugerencias_esperadas": 0,
+  "hallazgos": [
+    {
+      "categoria": 3,
+      "archivo": "code.sqf",
+      "linea": 2,
+      "severidad": "BLOQUEANTE",
+      "disciplina": "Servidor Dedicado (Headless)",
+      "descripcion": "Uso de 'player' en rama condicional de servidor ('isServer') donde 'player' es objNull en servidor dedicado",
+      "verificable_en": ["archivo", "pegado"]
+    }
+  ]
+}

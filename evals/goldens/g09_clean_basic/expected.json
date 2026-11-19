@@ -1,0 +1,8 @@
+{
+  "golden_id": "g09_clean_basic",
+  "descripcion": "Snippet limpio de cálculo matemático sin bloqueantes ni sugerencias",
+  "categoria_principal": 0,
+  "bloqueantes_esperados": 0,
+  "sugerencias_esperadas": 0,
+  "hallazgos": []
+}

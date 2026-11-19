@@ -1,0 +1,18 @@
+{
+  "golden_id": "g07_broken_interface",
+  "descripcion": "Llamada a función con tipos incompatibles violando el contrato de params",
+  "categoria_principal": 6,
+  "bloqueantes_esperados": 1,
+  "sugerencias_esperadas": 0,
+  "hallazgos": [
+    {
+      "categoria": 6,
+      "archivo": "code.sqf",
+      "linea": 11,
+      "severidad": "BLOQUEANTE",
+      "disciplina": "Arquitectura / Interfaces",
+      "descripcion": "Parámetros incompatibles en llamada a fnc_calculateVector violando contrato params",
+      "verificable_en": ["archivo", "pegado"]
+    }
+  ]
+}

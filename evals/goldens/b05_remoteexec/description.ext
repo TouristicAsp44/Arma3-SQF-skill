@@ -1,0 +1,17 @@
+class CfgRemoteExec
+{
+    class Functions
+    {
+        mode = 1;
+        jip = 0;
+
+        class fnc_safeRemote
+        {
+            allowedTargets = 0;
+        };
+    };
+    class Commands
+    {
+        mode = 1;
+    };
+};

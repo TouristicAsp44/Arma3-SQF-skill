@@ -1,0 +1,20 @@
+# Exclusiones de empaquetado (PR-1 1.n / 1.n-bis).
+# Material histórico congelado: no se distribuye ni se empaqueta.
+prune legacy
+prune evals/runs
+prune .pytest_cache
+prune __pycache__
+global-exclude *.db *.sqlite *.db-journal *.db-wal
+exclude skills/arma3-sqf-skill/references/wiki-cache.md
+
+include README.md
+include INSTALL.md
+include LICENSE
+include CONTRIBUTING.md
+include CHANGELOG.md
+include pyproject.toml
+recursive-include skills/arma3-sqf-skill *.md *.py *.txt
+recursive-include integrations *.md *.json
+recursive-include scripts *.py *.json
+recursive-include docs *.md
+recursive-include evals *.py *.md *.json *.sqf *.ext

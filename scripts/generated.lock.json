@@ -1,0 +1,16 @@
+{
+  "authored": {
+    "skills/arma3-sqf-skill/references/lenses/architect.md#AUTHORED:0": "b44c38f5523db373ebaa35b54ce899dbdae02a0e4936542486d8cafe709b1f8c",
+    "skills/arma3-sqf-skill/references/lenses/best_practices.md#AUTHORED:0": "c684c4f7f04a30909d300820435d176e92f4ff13f065ca8c4956e97483df34da",
+    "skills/arma3-sqf-skill/references/lenses/claims.md#AUTHORED:0": "f31c650e84bd6e6d0162788e14bd4272bd741d28584ef3d1f6317ff569ab505b",
+    "skills/arma3-sqf-skill/references/lenses/config.md#AUTHORED:0": "a2c44aaa0958cdf86dcc9ff5172e60349b88e8b988095518c1a801cf535ade65",
+    "skills/arma3-sqf-skill/references/lenses/locality.md#AUTHORED:0": "602b803192388c83bfcab7f634dfc4b865b0323b5544659b603d0630f7f30baa",
+    "skills/arma3-sqf-skill/references/lenses/performance.md#AUTHORED:0": "17c02ba6667397b2a35aa227487fdd3ca3bb7e5f4aceaa505ff6e8d2b1f6f4ab",
+    "integrations/claude/CLAUDE.md#AUTHORED:0": "173187f8fead872e69d90ac041d9cb28b49edfbf514a63dadc0efd7d05968571"
+  },
+  "generated": {
+    "integrations/chatgpt/custom_gpt_instructions.md": "dc80496046ee9465e61659cf626349e031d9d82b7a3fd34a0783fe3ba33e6eb8",
+    "integrations/gemini/system_instruction.md": "2c2f08d6f63f89aac429fe05cb1c190eab989c3bb36b6860be61037b1e507565",
+    "integrations/claude/claude_desktop_paste.md": "b93d9d01d36dd0531edea7c414cad816bbff736203121365e0f8128c476223d0"
+  }
+}

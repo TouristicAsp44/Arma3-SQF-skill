@@ -1,0 +1,35 @@
+# Cursor Rules — Arma 3 SQF Skill (arma3-sqf-skill)
+
+## Activación y Ámbito
+Aplica estas reglas siempre que el usuario trabaje con código de Arma 3:
+- Archivos `.sqf`, `.ext`, `.hpp`, `description.ext`, `config.cpp`.
+- Tareas de revisión, auditoría, refactorización o desarrollo SQF.
+
+## Convención de Rutas
+Todas las referencias de la skill son relativas a `skills/arma3-sqf-skill/`:
+- Punto de entrada principal: `skills/arma3-sqf-skill/SKILL.md`
+- Invariantes normativos: `skills/arma3-sqf-skill/references/invariants.md`
+- Lentes de disciplina: `skills/arma3-sqf-skill/references/lenses/`
+- Workflows especializados: `skills/arma3-sqf-skill/references/workflows/`
+
+## Invariantes Normativos Obligatorios (P0 Bloqueantes)
+1. **Sintaxis y Scope**: Toda variable local debe declararse con `private` o recibirse en `params`. Prohibido fugar variables al scope global.
+2. **Softlocks e Inicialización**: Todo `waitUntil` requiere condición garantizada o timeout. Prohibido usar `sleep`/`uiSleep`/`waitUntil` en el hilo principal de scripts de inicialización (`init.sqf`, `initServer.sqf`, `postInit`).
+3. **Servidor Dedicado (Headless)**: `player` es permanentemente `objNull` en servidor dedicado. Prohibido terminantemente ejecutar comandos UI (`hint`, `dialog`, etc.) en rutas de servidor; la guarda `if (hasInterface)` NO legitima comandos UI en rutas del servidor.
+4. **Suspensión en Contexto Unscheduled**: Prohibido usar `sleep`, `uiSleep` o `waitUntil` en contextos con `canSuspend == false` (`preInit`, Event Handlers del motor, `remoteExecCall`).
+5. **Whitelist de CfgRemoteExec**: Invocaciones remotas (`remoteExec`, `remoteExecCall`) deben figurar en la lista blanca de `CfgRemoteExec >> Functions` cuando `mode = 1`.
+6. **Contratos de Interfaz**: Parámetros tipados y coherentes en `params` entre llamador y función.
+7. **Dependencias de Framework**: Prohibido usar `CBA_fnc_*` o `ace_*` si el perfil declara `CBA: no` o `ACE3: no`.
+
+## Puerta de Calidad Infranqueable
+- Cero bloqueantes abiertos para considerar el trabajo terminado.
+- Si tras 3 iteraciones queda algún bloqueante abierto: detener el proceso, reportar el desglose al usuario y marcar como `DETENIDO (NO PASA)`.
+
+## Honestidad Técnica
+- Lo no ejecutado en servidor dedicado o no validado con fuente primaria se marca como `NO VERIFICADO`.
+- Si `sqflint` o la réplica local `a3ref` no están disponibles en la sesión actual, reportar como `NO VERIFICADO` (nunca `PASA`).
+
+## Formato del Informe Estructurado
+REPORT_SCHEMA_VERSION = 1
+[BLOQUEANTE|SUGERENCIA|NO_VERIFICADO] archivo:linea (disciplina): descripcion
+RESUMEN: bloqueantes=N; sugerencias=N; no_verificado=N

@@ -1,0 +1,7 @@
+{
+  "extraPaths": [
+    "skills/arma3-sqf-skill/scripts",
+    "skills/arma3-sqf-skill/references",
+    "."
+  ]
+}

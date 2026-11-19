@@ -1,0 +1,121 @@
+{
+  "updated": "2026-11-04T21:31:31Z",
+  "count": 5,
+  "items": [
+    {
+      "name": "addPublicVariableEventHandler",
+      "type": "command",
+      "md": "commands/addPublicVariableEventHandler.md",
+      "json": "commands/addPublicVariableEventHandler.json",
+      "groups": [
+        "Broken Commands",
+        "Event Handlers",
+        "Multiplayer",
+        "Variables"
+      ],
+      "syntax": [
+        "varName addPublicVariableEventHandler code",
+        "varName addPublicVariableEventHandler [target, code]"
+      ],
+      "summary": "This event handler will detect if a missionNamespace variable (it is attached to) has been broadcast over network with publicVariable, publicVariableClient or publicVariableServer commands and will execute EH code upon…",
+      "arma3_since": "0.50",
+      "locality": {
+        "argument": "global",
+        "effect": "local",
+        "server_exec": false
+      },
+      "status": "broken",
+      "operator": null,
+      "aliases": []
+    },
+    {
+      "name": "isDedicated",
+      "type": "command",
+      "md": "commands/isDedicated.md",
+      "json": "commands/isDedicated.json",
+      "groups": [
+        "Multiplayer"
+      ],
+      "syntax": [
+        "isDedicated"
+      ],
+      "summary": "Returns true if the machine executing the command is a dedicated multiplayer server. Returns false in single player.",
+      "arma3_since": "0.50",
+      "locality": {
+        "argument": null,
+        "effect": null,
+        "server_exec": false
+      },
+      "status": "ok",
+      "operator": null,
+      "aliases": []
+    },
+    {
+      "name": "remoteExec",
+      "type": "command",
+      "md": "commands/remoteExec.md",
+      "json": "commands/remoteExec.json",
+      "groups": [
+        "Multiplayer"
+      ],
+      "syntax": [
+        "params remoteExec [order, targets, JIP]",
+        "remoteExec [functionName, targets, JIP]"
+      ],
+      "summary": "Asks the server to execute the given function or script command on the given target machine(s).",
+      "arma3_since": "1.50",
+      "locality": {
+        "argument": null,
+        "effect": null,
+        "server_exec": false
+      },
+      "status": "ok",
+      "operator": null,
+      "aliases": []
+    },
+    {
+      "name": "BIS_fnc_guiMessage",
+      "type": "function",
+      "md": "functions/BIS_fnc_guiMessage.md",
+      "json": "functions/BIS_fnc_guiMessage.json",
+      "groups": [
+        "GUI"
+      ],
+      "syntax": [
+        "[message, header, okButton, cancelButton, parent, useParentBox, pause] call BIS_fnc_guiMessage"
+      ],
+      "summary": "Displays an interactive message dialog in the center of the screen.",
+      "arma3_since": "0.50",
+      "locality": {
+        "argument": null,
+        "effect": "local",
+        "server_exec": false
+      },
+      "status": "ok",
+      "operator": null,
+      "aliases": []
+    },
+    {
+      "name": "BIS_fnc_MP",
+      "type": "function",
+      "md": "functions/BIS_fnc_MP.md",
+      "json": "functions/BIS_fnc_MP.json",
+      "groups": [
+        "Multiplayer"
+      ],
+      "syntax": [
+        "[params, functionName, target, isPersistent, isCall] call BIS_fnc_MP"
+      ],
+      "summary": "Send function for remote execution (and executes locally if conditions are met).",
+      "arma3_since": "0.50",
+      "locality": {
+        "argument": null,
+        "effect": null,
+        "server_exec": false
+      },
+      "status": "deprecated",
+      "operator": null,
+      "aliases": []
+    }
+  ]
+}

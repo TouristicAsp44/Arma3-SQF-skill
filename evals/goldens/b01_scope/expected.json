@@ -1,0 +1,20 @@
+{
+  "golden_id": "b01_scope",
+  "descripcion": "Variable local _pos asignada sin private ni params en funcion",
+  "categoria_principal": 1,
+  "señalizado": false,
+  "determinista": true,
+  "bloqueantes_esperados": 1,
+  "sugerencias_esperadas": 0,
+  "hallazgos": [
+    {
+      "categoria": 1,
+      "archivo": "code.sqf",
+      "linea": 3,
+      "severidad": "BLOQUEANTE",
+      "disciplina": "Scope / Sintaxis",
+      "descripcion": "Variable local '_pos' no declarada con private ni recibida en params",
+      "verificable_en": ["archivo", "pegado"]
+    }
+  ]
+}

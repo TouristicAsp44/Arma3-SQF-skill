@@ -1,0 +1,282 @@
+{
+  "updated": "2026-11-04T21:31:31Z",
+  "source": "a3ref",
+  "count": 2,
+  "items": [
+    {
+      "name": "BIS_fnc_guiMessage",
+      "title": "BIS fnc guiMessage",
+      "type": "function",
+      "url": "https://community.bistudio.com/wiki/BIS_fnc_guiMessage",
+      "revid": 379269,
+      "updated": "2026-10-30T23:44:03Z",
+      "groups": [
+        "GUI"
+      ],
+      "status": "ok",
+      "games": {
+        "arma3": "0.50"
+      },
+      "since": "arma3 0.50",
+      "arma3_since": "0.50",
+      "locality": {
+        "effect": "local"
+      },
+      "exec": "call",
+      "description": "Displays an interactive message dialog in the center of the screen.\n\n> [!IMPORTANT]\n> This function internally utilizes suspension (waitUntil to be specific) and therefore has to be executed in a scheduled environment.",
+      "syntaxes": [
+        {
+          "syntax": "[message, header, okButton, cancelButton, parent, useParentBox, pause] call BIS_fnc_guiMessage",
+          "params": [
+            {
+              "name": "message",
+              "type": "String or Structured Text",
+              "optional": true,
+              "default": "\"\"",
+              "description": "message",
+              "type_expr": "String | Structured Text",
+              "text": "message: String or Structured Text - (Optional, default: \"\") message"
+            },
+            {
+              "name": "header",
+              "type": "String",
+              "optional": true,
+              "default": "\"\"",
+              "description": "header text",
+              "type_expr": "String",
+              "text": "header: String - (Optional, default: \"\") header text"
+            },
+            {
+              "name": "okButton",
+              "type": "Boolean or String",
+              "optional": true,
+              "default": "true",
+              "description": "Boolean - enable the \"OK\" button\n- String - custom text for the \"OK\" button",
+              "type_expr": "Boolean | String",
+              "text": "okButton: Boolean or String - (Optional, default true):\n\n- Boolean - enable the \"OK\" button\n- String - custom text for the \"OK\" button"
+            },
+            {
+              "name": "cancelButton",
+              "type": "Boolean or String",
+              "optional": true,
+              "default": "false",
+              "description": "Boolean - enable the \"Cancel\" button\n- String - custom text for the \"Cancel\" button",
+              "type_expr": "Boolean | String",
+              "text": "cancelButton: Boolean or String - (Optional, default false):\n\n- Boolean - enable the \"Cancel\" button\n- String - custom text for the \"Cancel\" button"
+            },
+            {
+              "name": "parent",
+              "type": "Display",
+              "optional": true,
+              "default": "`[] call BIS_fnc_displayMission`",
+              "description": "parent display",
+              "type_expr": "Display",
+              "text": "parent: Display - (Optional, default: `[] call BIS_fnc_displayMission`) parent display"
+            },
+            {
+              "name": "useParentBox",
+              "type": "Boolean",
+              "optional": true,
+              "default": "false",
+              "description": "try to use control inherited from \"RscMessageBox\" in parent instead of creating a new one",
+              "type_expr": "Boolean",
+              "text": "useParentBox: Boolean - (Optional, default: false) try to use control inherited from \"RscMessageBox\" in parent instead of creating a new one"
+            },
+            {
+              "name": "pause",
+              "type": "Boolean",
+              "optional": true,
+              "default": "true",
+              "description": "pause simulation while message dialog is open (no effect in multiplayer)",
+              "type_expr": "Boolean",
+              "text": "pause: Boolean - (Optional, default: true) pause simulation while message dialog is open (no effect in multiplayer)"
+            }
+          ],
+          "returns": {
+            "type": "Boolean",
+            "type_expr": "Boolean",
+            "description": "true if the \"OK\" button was pressed, otherwise false. Returned only after the message box is closed."
+          }
+        }
+      ],
+      "examples": [
+        {
+          "text": "Because this example uses spawn, the return value of BIS_fnc_guiMessage is lost and can not be used.\n\n```sqf\n[\"Hello World\"] spawn BIS_fnc_guiMessage;\n```",
+          "code": [
+            "[\"Hello World\"] spawn BIS_fnc_guiMessage;"
+          ]
+        },
+        {
+          "text": "```sqf\nprivate _result = [\"Are you sure?\", \"Confirm\", true, true] call BIS_fnc_guiMessage;\n\nif (_result) then {\n    systemChat \"The player is sure.\";\n} else {\n    systemChat \"The player is not sure.\";\n};\n```",
+          "code": [
+            "private _result = [\"Are you sure?\", \"Confirm\", true, true] call BIS_fnc_guiMessage;\n\nif (_result) then {\n\tsystemChat \"The player is sure.\";\n} else {\n\tsystemChat \"The player is not sure.\";\n};"
+          ]
+        }
+      ],
+      "see_also": [
+        "BIS_fnc_GUIhint",
+        "BIS_fnc_3DENShowMessage",
+        "hintC"
+      ],
+      "notes": [
+        {
+          "user": "AgentRev",
+          "date": "2014-06-24T00:43:00Z",
+          "text": "Message boxes can be force-closed with:\n\n```sqf\nuiNamespace setVariable [\"BIS_fnc_guiMessage_status\", false];\n```"
+        },
+        {
+          "user": "Eden",
+          "date": "2016-01-13T15:16:00Z",
+          "text": "Calling this function can cause an game crash. When doing this you have to spawn the function or add an spawn around it so you can use the result:\n\n```sqf\n[] spawn\n{\n    private _result = [\"Are you sure?\", \"Confirm\", true, true] call BIS_fnc_guiMessage;\n    // Use _result here\n};\n```"
+        },
+        {
+          "user": "Demellion",
+          "date": "2017-11-01T18:35:00Z",
+          "text": "This function only exists along with mission display (findDisplay 46). If this function is called before with *-skipIntro* parameter enabled (see Arma 3: Startup Parameters) it will result as Void."
+        }
+      ],
+      "categories_extra": [
+        "Introduced with Take On Helicopters version 1.00",
+        "Take On Helicopters: Functions",
+        "Take On Helicopters: New Functions"
+      ]
+    },
+    {
+      "name": "BIS_fnc_MP",
+      "title": "BIS fnc MP",
+      "type": "function",
+      "url": "https://community.bistudio.com/wiki/BIS_fnc_MP",
+      "revid": 379275,
+      "updated": "2026-10-30T23:44:51Z",
+      "groups": [
+        "Multiplayer"
+      ],
+      "status": "deprecated",
+      "replaced_by": [
+        "remoteExec",
+        "remoteExecCall"
+      ],
+      "games": {
+        "arma3": "0.50"
+      },
+      "since": "arma3 0.50",
+      "arma3_since": "0.50",
+      "description": "Send function for remote execution (and executes locally if conditions are met).\n\n> [!WARNING]\n> Arma 3 v1.50 This function has been replaced by remoteExec and remoteExecCall. While BIS_fnc_MP still works (to provide backwards compatibility), it is now deprecated and should no longer be used. See Arma 3: Remote Execution for more information.",
+      "syntaxes": [
+        {
+          "syntax": "[params, functionName, target, isPersistent, isCall] call BIS_fnc_MP",
+          "params": [
+            {
+              "name": "params",
+              "type": "Anything",
+              "description": "function arguments. Variables can be local.",
+              "type_expr": "Anything",
+              "text": "**params**: Anything - function arguments. Variables can be local."
+            },
+            {
+              "name": "functionName",
+              "type": "String",
+              "description": "function or scripting command name.",
+              "type_expr": "String",
+              "text": "**functionName**: String - function or scripting command name."
+            },
+            {
+              "name": "target",
+              "type": "Object, String, Boolean, Number, Side, Group or Array",
+              "description": "Object, String, Boolean, Number, Side, Group or Array\n\n- Object - the function will be executed only where unit is local [default: everyone]\n- String - the function will be executed only where object or group defined by the variable with passed name is local\n- Boolean - true to execute on each machine (including the one where the function was called from), false to execute it on server only\n- Number - function will be executed only on client with the given owner ID\n- Side - function will be executed only on clients where the player is on the specified side\n- Group - function will be executed only on clients where the player is in the specified group\n- Array - array of targets of types listed above",
+              "type_expr": "Object | String | Boolean | Number | Side | Group | Array",
+              "text": "**target**: Object, String, Boolean, Number, Side, Group or Array\n\n- Object - the function will be executed only where unit is local [default: everyone]\n- String - the function will be executed only where object or group defined by the variable with passed name is local\n- Boolean - true to execute on each machine (including the one where the function was called from), false to execute it on server only\n- Number - function will be executed only on client with the given owner ID\n- Side - function will be executed only on clients where the player is on the specified side\n- Group - function will be executed only on clients where the player is in the specified group\n- Array - array of targets of types listed above"
+            },
+            {
+              "name": "isPersistent",
+              "type": "Boolean",
+              "optional": true,
+              "default": "false",
+              "description": "true for persistent call (will be called now and for every JIP client)",
+              "type_expr": "Boolean",
+              "text": "**isPersistent**: Boolean - (Optional, default false) true for persistent call (will be called now and for every JIP client)"
+            },
+            {
+              "name": "isCall",
+              "type": "Boolean",
+              "optional": true,
+              "default": "false",
+              "description": "true if function should be called on target machine, false to spawn it",
+              "type_expr": "Boolean",
+              "text": "**isCall**: Boolean - (Optional, default false) true if function should be called on target machine, false to spawn it"
+            }
+          ],
+          "returns": {
+            "type": "Array",
+            "type_expr": "Array",
+            "description": "sent packet"
+          }
+        }
+      ],
+      "examples": [
+        {
+          "code": [
+            "// logs a message for every player on the server.\n[\"Imma spamming your log!\", \"BIS_fnc_log\"] call BIS_fnc_MP;"
+          ]
+        },
+        {
+          "code": [
+            "// send a hint containing \"Hello World\" to every player, including the ones who joins later using JIP.\n[\"Hello World\", \"hint\", true, true] call BIS_fnc_MP;"
+          ]
+        },
+        {
+          "code": [
+            "// executes \"playerConnected.sqf\" script on server every time a player joins the game.\n[[[], \"playerConnected.sqf\"], \"BIS_fnc_execVM\", false, true] call BIS_fnc_MP;"
+          ]
+        },
+        {
+          "code": [
+            "// adds action to every player including JIP. \"...\" = further optional arguments (see addAction)\n[[player], [\"My Action Title\", \"myAction.sqf\" /* etc */]], \"addAction\", true, true] call BIS_fnc_MP;"
+          ]
+        }
+      ],
+      "see_also": [
+        "BIS_fnc_MPexec",
+        "Arma 3 Remote Execution"
+      ],
+      "notes": [
+        {
+          "user": "Fireball",
+          "date": "2013-04-02T19:02:00Z",
+          "text": "Note that the function you provide as argument is *not* transferred to the remote client or server.\n\nYou will have to use either\n\n1. functions defined in global namespace\n1. functions defined depending on where you want to execute them; in server or/and client code if you separate it using conditions on isServer or local player\n1. pre-defined BIS functions\n\nYou can also execute scripts remotely like this:\n\n```sqf\n[\"myScript.sqf\", \"BIS_fnc_execVM\", true, true] call BIS_fnc_MP;\n```\n\nOr transfer code as parameter (not recommended) like that:\n\n```sqf\n[{ hint \"Hello World!\"; }, \"BIS_fnc_spawn\", true, true] call BIS_fnc_MP;\n```"
+        },
+        {
+          "user": "kylania",
+          "date": "2013-07-04T21:20:00Z",
+          "text": "> « One key note when designing a mission/script is to limit the amount of use you make of the isPersistent parameter. It is not recommended to use it often for vehicle creation, object creation, etc.\n> Each time you use the isPersistent parameter it adds to a BIS Logic which is used to sync all clients and new clients that join, excessive use of the command will make the logic build up and eventually you will cause the server to desync out because of the massive amount of data it has to send to all clients and JIP clients to try to keep them in sync.\n>\n> It is highly recommended to make as little use as possible of the isPersistent option unless you have to for network performance sake. » – [Tonic](http://forums.bistudio.com/member.php?75622-Tonic-_)"
+        },
+        {
+          "user": "Killzone_Kid",
+          "date": "2013-12-10T13:37:00Z",
+          "text": "If you need to achieve a single global execution of an existing function on all PCs including your own, the syntax could not be any more simple than: [arguments, functionname] call BIS_fnc_MP; This is particularly useful with commands such as switchMove where the command effect is local.\n\nFor example to make sure animation is played on every PC, first define a global function on every PC (maybe inside init.sqf):\n\n```sqf\nswitchMoveEverywhere = compileFinal \"\n    _this select 0 switchMove (_this select 1);\n\";\n```\n\nThen execute BIS_fnc_MP on only one PC which will in return execute *switchMoveEverywhere* function everywhere:\n\n```sqf\n[\n    [\n        player,\n        \"AmovPercMstpSrasWrflDnon_AadjPpneMstpSrasWrflDleft\"\n    ],\n    \"switchMoveEverywhere\"\n] call BIS_fnc_MP;\n```"
+        },
+        {
+          "user": "Waffle SS.",
+          "date": "2015-05-23T21:47:00Z",
+          "text": "Adding onto what Killzone_Kid said, a custom function isn't necessary when using only a single command.\n\n```sqf\n[\n    [player, \"AmovPercMstpSrasWrflDnon_AadjPpneMstpSrasWrflDleft\"],\n    \"switchMove\"\n] call BIS_fnc_MP;\n```"
+        },
+        {
+          "user": "Warka",
+          "date": "2015-06-08T12:08:00Z",
+          "text": "From version 1.50 the function BIS_fnc_MP will use the engine based remote execution.\n\n- This will positively affect its performance, namely processing speed and amount of transferred data.\n- The syntax and functionality of BIS_fnc_MP will remain same to retain the backward compatibility.\n- To prevent abusing of the remoteExec and remoteExecCall commands the BIS_fnc_MP will use, the content authors will be able to define the operation modes as well as white-lists for commands/functions for clients and server separately.\n- White-lists defined in *CfgRemoteExecCommands* and *CfgRemoteExecFunctions* won't be supported from 1.48 as they will be replaced by the new structure more powerful and detailed structure: CfgRemoteExec."
+        },
+        {
+          "user": "Waffle SS.",
+          "date": "2015-07-20T21:07:00Z",
+          "text": "Pay close attention to where and when you call BIS_fnc_MP. If you use it on the server during init, it will probably run before the player is loaded into the server, and the player behaves more like a JIP. Either waiting for the briefing to end (time > 0), or using the JIP parameter in BIS_fnc_MP are two ways of getting around this issue."
+        }
+      ],
+      "categories_extra": [
+        "Arma 3: Remote Execution",
+        "Introduced with Take On Helicopters version 1.00",
+        "Take On Helicopters: Functions",
+        "Take On Helicopters: New Functions"
+      ]
+    }
+  ]
+}

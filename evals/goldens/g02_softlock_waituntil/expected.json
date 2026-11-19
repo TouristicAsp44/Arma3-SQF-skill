@@ -1,0 +1,18 @@
+{
+  "golden_id": "g02_softlock_waituntil",
+  "descripcion": "waitUntil sin condición de salida garantizada ni timeout de seguridad",
+  "categoria_principal": 2,
+  "bloqueantes_esperados": 1,
+  "sugerencias_esperadas": 0,
+  "hallazgos": [
+    {
+      "categoria": 2,
+      "archivo": "code.sqf",
+      "linea": 4,
+      "severidad": "BLOQUEANTE",
+      "disciplina": "Locality / Scheduler",
+      "descripcion": "waitUntil sin timeout de seguridad ni salida garantizada (softlock potencial)",
+      "verificable_en": ["archivo", "pegado"]
+    }
+  ]
+}

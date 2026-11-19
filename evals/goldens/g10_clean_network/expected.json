@@ -1,0 +1,8 @@
+{
+  "golden_id": "g10_clean_network",
+  "descripcion": "Lógica multijugador limpia: remoteExec dirigido, sin player en server, sin UI",
+  "categoria_principal": 0,
+  "bloqueantes_esperados": 0,
+  "sugerencias_esperadas": 0,
+  "hallazgos": []
+}

@@ -1,0 +1,20 @@
+{
+  "golden_id": "b04_unscheduled",
+  "descripcion": "Llamada a sleep dentro de un Event Handler de motor unscheduled",
+  "categoria_principal": 4,
+  "señalizado": false,
+  "determinista": false,
+  "bloqueantes_esperados": 1,
+  "sugerencias_esperadas": 0,
+  "hallazgos": [
+    {
+      "categoria": 4,
+      "archivo": "code.sqf",
+      "linea": 5,
+      "severidad": "BLOQUEANTE",
+      "disciplina": "Contexto Scheduled",
+      "descripcion": "Uso de 'sleep' dentro de Event Handler de motor (contexto unscheduled donde canSuspend es false)",
+      "verificable_en": ["archivo", "pegado"]
+    }
+  ]
+}

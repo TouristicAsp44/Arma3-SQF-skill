@@ -1,0 +1,8 @@
+{
+  "golden_id": "g11_clean_scheduled",
+  "descripcion": "waitUntil limpio con timeout explícito y evaluación perezosa",
+  "categoria_principal": 0,
+  "bloqueantes_esperados": 0,
+  "sugerencias_esperadas": 0,
+  "hallazgos": []
+}

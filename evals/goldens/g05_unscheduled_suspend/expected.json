@@ -1,0 +1,18 @@
+{
+  "golden_id": "g05_unscheduled_suspend",
+  "descripcion": "sleep dentro de un Event Handler de motor (contexto unscheduled)",
+  "categoria_principal": 4,
+  "bloqueantes_esperados": 1,
+  "sugerencias_esperadas": 0,
+  "hallazgos": [
+    {
+      "categoria": 4,
+      "archivo": "code.sqf",
+      "linea": 6,
+      "severidad": "BLOQUEANTE",
+      "disciplina": "Locality / Scheduler",
+      "descripcion": "sleep invocado en contexto unscheduled (EH del motor con canSuspend == false)",
+      "verificable_en": ["archivo", "pegado"]
+    }
+  ]
+}

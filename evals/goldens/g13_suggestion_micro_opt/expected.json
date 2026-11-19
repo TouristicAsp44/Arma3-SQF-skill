@@ -1,0 +1,18 @@
+{
+  "golden_id": "g13_suggestion_micro_opt",
+  "descripcion": "Micro-optimización de conteo de array mediante isEqualTo en lugar de count > 0",
+  "categoria_principal": 1,
+  "bloqueantes_esperados": 0,
+  "sugerencias_esperadas": 1,
+  "hallazgos": [
+    {
+      "categoria": 1,
+      "archivo": "code.sqf",
+      "linea": 4,
+      "severidad": "SUGERENCIA",
+      "disciplina": "Buenas Prácticas",
+      "descripcion": "Uso de count _arr > 0 en lugar de !(_arr isEqualTo []) para comprobar vacío",
+      "verificable_en": ["archivo", "pegado"]
+    }
+  ]
+}

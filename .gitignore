@@ -1,0 +1,78 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Caches de herramientas y testing
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pytype/
+.pyre/
+
+# Cobertura de pruebas
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.cover
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Distribución y empaquetado Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Editores y entornos de desarrollo
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# Archivos de sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Respaldos y temporales
+*.bak
+*.bak.*
+*.bak.latest
+*.tmp
+
+# Archivos comprimidos
+*.zip
+*.tar
+*.gz
+*.rar
+*.7z
+
+# Logs y reportes locales
+*.log
+*.rpt
+
+# Caches locales (PR-6-PREP C.2)
+skills/arma3-sqf-skill/references/wiki-cache.md
+
+# Trazas crudas de evaluación (PR-1 1.n-bis): pueden contener código del
+# usuario. Lo que se versiona es docs/QUALITY.md (agregado) y evals/samples/.
+evals/runs/
+
+# Material histórico congelado: no se versiona ni se empaqueta (PR-1 1.n)
+legacy/
+
+# Base de datos local SQLite (PR-3 3.f): no se versiona ni se empaqueta
+*.db
+*.sqlite
+*.db-journal
+*.db-wal

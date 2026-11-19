@@ -1,0 +1,18 @@
+{
+  "golden_id": "g12_suggestion_lazy_eval",
+  "descripcion": "Uso de 'and' en lugar de evaluación perezosa && { ... } en condición compuesta",
+  "categoria_principal": 1,
+  "bloqueantes_esperados": 0,
+  "sugerencias_esperadas": 1,
+  "hallazgos": [
+    {
+      "categoria": 1,
+      "archivo": "code.sqf",
+      "linea": 6,
+      "severidad": "SUGERENCIA",
+      "disciplina": "Buenas Prácticas",
+      "descripcion": "Oportunidad de evaluación perezosa con && { ... } para evitar cómputo de inArea cuando _isAlive sea falso",
+      "verificable_en": ["archivo", "pegado"]
+    }
+  ]
+}

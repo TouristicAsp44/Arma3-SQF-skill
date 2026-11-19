@@ -1,0 +1,56 @@
+{
+  "updated": "2026-11-04T21:31:31Z",
+  "commands": {
+    "addpublicvariableeventhandler": {
+      "name": "addPublicVariableEventHandler",
+      "forms": [
+        "binary"
+      ],
+      "status": "broken",
+      "syntax": [
+        "varName addPublicVariableEventHandler code",
+        "varName addPublicVariableEventHandler [target, code]"
+      ],
+      "replaced_by": [
+        "remoteExec",
+        "remoteExecCall"
+      ]
+    },
+    "isdedicated": {
+      "name": "isDedicated",
+      "forms": [
+        "nullary"
+      ],
+      "status": "ok",
+      "syntax": [
+        "isDedicated"
+      ]
+    },
+    "remoteexec": {
+      "name": "remoteExec",
+      "forms": [
+        "binary",
+        "unary"
+      ],
+      "status": "ok",
+      "syntax": [
+        "params remoteExec [order, targets, JIP]",
+        "remoteExec [functionName, targets, JIP]"
+      ]
+    }
+  },
+  "functions": {
+    "bis_fnc_guimessage": {
+      "name": "BIS_fnc_guiMessage",
+      "status": "ok"
+    },
+    "bis_fnc_mp": {
+      "name": "BIS_fnc_MP",
+      "status": "deprecated",
+      "replaced_by": [
+        "remoteExec",
+        "remoteExecCall"
+      ]
+    }
+  }
+}

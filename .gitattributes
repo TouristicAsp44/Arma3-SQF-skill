@@ -1,0 +1,36 @@
+# Detección automática y normalización a LF para el repositorio
+* text=auto eol=lf
+
+# Python y configuración
+*.py text diff=python eol=lf
+*.pyi text diff=python eol=lf
+*.toml text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+
+# Scripts de terminal Windows
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Formatos de motor Arma 3
+*.sqf text eol=crlf
+*.hpp text eol=crlf
+*.cpp text eol=crlf
+*.ext text eol=crlf
+
+# Material histórico congelado: no se exporta en releases ni sdists
+legacy/** export-ignore
+
+# Archivos binarios
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.pbo binary
+*.paa binary
+*.bikey binary
+*.biprivatekey binary

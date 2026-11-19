@@ -1,0 +1,19 @@
+{
+  "golden_id": "g01b_syntax_error",
+  "descripcion": "Error de sintaxis SQF por paréntesis no cerrado",
+  "categoria_principal": 1,
+  "determinista": true,
+  "bloqueantes_esperados": 1,
+  "sugerencias_esperadas": 0,
+  "hallazgos": [
+    {
+      "categoria": 1,
+      "archivo": "code.sqf",
+      "linea": 4,
+      "severidad": "BLOQUEANTE",
+      "disciplina": "Scope / Sintaxis",
+      "descripcion": "Error sintáctico SQF por paréntesis '(' no cerrado",
+      "verificable_en": ["archivo", "pegado"]
+    }
+  ]
+}

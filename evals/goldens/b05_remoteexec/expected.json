@@ -1,0 +1,20 @@
+{
+  "golden_id": "b05_remoteexec",
+  "descripcion": "remoteExec hacia funcion no autorizada en CfgRemoteExec de description.ext",
+  "categoria_principal": 5,
+  "señalizado": false,
+  "determinista": false,
+  "bloqueantes_esperados": 1,
+  "sugerencias_esperadas": 0,
+  "hallazgos": [
+    {
+      "categoria": 5,
+      "archivo": "code.sqf",
+      "linea": 3,
+      "severidad": "BLOQUEANTE",
+      "disciplina": "CfgRemoteExec",
+      "descripcion": "remoteExec hacia fnc_unauthorizedRemote no autorizada en CfgRemoteExec (mode = 1)",
+      "verificable_en": ["archivo"]
+    }
+  ]
+}
