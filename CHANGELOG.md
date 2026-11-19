@@ -68,4 +68,5 @@ Gemini y Antigravity, con `dependencies = []` (solo biblioteca estándar de Pyth
   La evidencia publicada es el agregado de `docs/QUALITY.md`.
 - Licencia MIT.
 
-[1.0.0]: https://github.com/TouristicAsp44/Arma3-SQF-review/releases/tag/v1.0.0
+[1.0.0]: https://github.com/TouristicAsp44/Arma3-SQF-skill/releases/tag/v1.0.0
+[1.0.0-rc.1]: https://github.com/TouristicAsp44/Arma3-SQF-skill/releases/tag/v1.0.0-rc.1

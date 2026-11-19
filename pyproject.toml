@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "arma3-sqf-skill"
-version = "1.0.0"
+version = "1.0.0-rc.1"
 description = "Skill universal de análisis y revisión SQF para Arma 3 — compatible con Claude, ChatGPT, Cursor y cualquier host MCP/OpenAPI"
 readme = "README.md"
 license = { text = "MIT" }
@@ -24,9 +24,9 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Homepage = "https://github.com/TouristicAsp44/Arma3-SQF-review"
-Repository = "https://github.com/TouristicAsp44/Arma3-SQF-review"
-Issues = "https://github.com/TouristicAsp44/Arma3-SQF-review/issues"
+Homepage = "https://github.com/TouristicAsp44/Arma3-SQF-skill"
+Repository = "https://github.com/TouristicAsp44/Arma3-SQF-skill"
+Issues = "https://github.com/TouristicAsp44/Arma3-SQF-skill/issues"
 
 [project.optional-dependencies]
 linter = [
