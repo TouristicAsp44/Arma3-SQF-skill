@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "arma3-sqf-skill"
-version = "1.0.0-rc.1"
+version = "1.0.0"
 description = "Skill universal de análisis y revisión SQF para Arma 3 — compatible con Claude, ChatGPT, Cursor y cualquier host MCP/OpenAPI"
 readme = "README.md"
 license = { text = "MIT" }

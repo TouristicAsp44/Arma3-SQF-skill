@@ -920,7 +920,6 @@ def generate_quality_markdown(
         "2. Para hosts con ejecuciones reales, las métricas M2 y M3 se calculan exclusivamente desde trazas reproducibles en `evals/runs/`.",
         "3. Cualquier host sin trazas queda registrado como `NO VERIFICADO` con motivo explícito y sin atribuir modelos ficticios, cumpliendo rigurosamente con el **Principio de Honestidad Técnica** (`references/invariants.md`).",
         "4. Para ejecutar la suite de goldens en hosts adicionales y generar trazas, consulta el protocolo en [`evals/GOLDENS-PROTOCOL.md`](../evals/GOLDENS-PROTOCOL.md).",
-        "5. Los resultados de los casos de smoke tests se encuentran en [`docs/SMOKE-RESULTS.md`](SMOKE-RESULTS.md).",
         "",
         "---",
         "",

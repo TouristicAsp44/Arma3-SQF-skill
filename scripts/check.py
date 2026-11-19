@@ -54,7 +54,8 @@ CHECKS: list[tuple[str, list[str], str, bool]] = [
     ("paquetes inline", ["tests/test_inline_packages.py"], "PR-4", True),
     ("adaptadores host", ["tests/test_host_adapters.py"], "PR-4", True),
     ("goldens", ["tests/test_goldens_dataset.py"], "PR-5", True),
-    ("evidencia smoke", ["tests/test_smoke_evidence.py"], "PR-5", True),
+    ("evidencia de honestidad", ["tests/test_honestidad.py"], "PR-5", True),
+    ("limpieza e integridad de referencias", ["tests/test_no_stale_references.py"], "PR-5", True),
     ("cobertura paquete inline", ["tests/test_inline_package_coverage.py"], "PR-5", True),
     ("mcp handshake", ["tests/test_mcp_server.py::test_mcp_handshake_and_tools_list"], "PR-6", True),
     (

@@ -169,10 +169,11 @@ def test_no_local_machine_paths_in_versioned_files() -> None:
         ]
 
     forbidden_patterns = [
-        re.compile(r"C:[\\/]Users[\\/]", re.IGNORECASE),
+        re.compile(r"[A-Za-z]:[\\/]Users[\\/]", re.IGNORECASE),
         re.compile(r"/Users/[a-zA-Z0-9_.-]+", re.IGNORECASE),
-        re.compile(r"EDEN\s+EDITOR", re.IGNORECASE),
-        re.compile(r"/home/(?!steam|runner)[a-zA-Z0-9_.-]+"),
+        re.compile(r"EDEN\s*EDITOR", re.IGNORECASE),
+        re.compile(r"Eden/MP", re.IGNORECASE),
+        re.compile(r"/home/(?!steam|runner)[a-zA-Z0-9_.-]+", re.IGNORECASE),
     ]
 
     binary_exts = {".png", ".ico", ".pyc", ".db", ".sqlite", ".tar", ".gz", ".zip"}
@@ -180,8 +181,6 @@ def test_no_local_machine_paths_in_versioned_files() -> None:
 
     for path in tracked_files:
         if path.resolve() == THIS_FILE or path.suffix.lower() in binary_exts:
-            continue
-        if path.name == "INSTRUCCION-ANTIGRAVITY-PR7.md":
             continue
         try:
             text = path.read_text(encoding="utf-8")

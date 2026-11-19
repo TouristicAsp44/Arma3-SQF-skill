@@ -1,16 +1,16 @@
-# Dependencias de `arma3-sqf-skill` (consolidado — PR-1 1.i).
+# Dependencias de `arma3-sqf-skill` (consolidado).
 #
-# El motor de scripts (skills/arma3-sqf-skill/scripts) usa EXCLUSIVAMENTE la
-# biblioteca estándar de Python (>=3.11). No hay dependencias obligatorias.
+# RUNTIME: El motor de scripts usa EXCLUSIVAMENTE la biblioteca estándar de Python (>=3.11).
+# dependencies = [] en pyproject.toml (cero dependencias obligatorias).
 #
-# | Dependencia | PyPI          | Versión   | Licencia | ¿Obligatoria? | Si falta                      |
-# |-------------|---------------|-----------|----------|----------------|-------------------------------|
-# | sqflint     | sqflint       | >=0.3.2   | MIT      | No (opcional)  | `SQFLINT_NO_DISPONIBLE` -> NO VERIFICADO (comportamiento soportado, no bug) |
+# DEPENDENCIA OPCIONAL DE ANÁLISIS ESTÁTICO (ver [project.optional-dependencies].linter):
+# Si sqflint no está instalado, el motor reporta SQFLINT_NO_DISPONIBLE -> NO VERIFICADO
+# (comportamiento soportado y transparente, no es un error).
 #
-# El análisis estático determinista usa `import sqf.analyzer` en proceso: no
-# requiere el binario `sqflint` en el PATH.
+# Para instalar con soporte de linter opcional:
+#   pip install .[linter]
+#   o descomentar la línea siguiente:
+# sqflint>=0.3.2
 #
-# Dependencias de desarrollo (ver [project.optional-dependencies].dev en
-# pyproject.toml): pytest, pytest-cov, ruff, sqflint.
-
-sqflint>=0.3.2
+# Para desarrollo y pruebas completas (ver requirements-dev.txt o pip install .[dev]):
+#   pip install -r requirements-dev.txt

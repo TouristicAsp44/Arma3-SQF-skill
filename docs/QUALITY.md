@@ -1,5 +1,5 @@
 <!-- GENERATED FROM: evals/harness.py | DO NOT EDIT -->
-<!-- SOURCE-HASH: 707713f8aaa65cf2ab9f2980d589263d290210e882458de9891bf009f4e59590 -->
+<!-- SOURCE-HASH: 0a2a0a83ed3b805d7061f851c6501e7ab3d168957846c3c0ac7a5b3af25502a2 -->
 
 # Informe Formal de Calidad y Métricas de Evaluación — `arma3-sqf-skill`
 
@@ -57,7 +57,6 @@ En este entorno de validación local:
 2. Para hosts con ejecuciones reales, las métricas M2 y M3 se calculan exclusivamente desde trazas reproducibles en `evals/runs/`.
 3. Cualquier host sin trazas queda registrado como `NO VERIFICADO` con motivo explícito y sin atribuir modelos ficticios, cumpliendo rigurosamente con el **Principio de Honestidad Técnica** (`references/invariants.md`).
 4. Para ejecutar la suite de goldens en hosts adicionales y generar trazas, consulta el protocolo en [`evals/GOLDENS-PROTOCOL.md`](../evals/GOLDENS-PROTOCOL.md).
-5. Los resultados de los casos de smoke tests se encuentran en [`docs/SMOKE-RESULTS.md`](SMOKE-RESULTS.md).
 
 ---
 

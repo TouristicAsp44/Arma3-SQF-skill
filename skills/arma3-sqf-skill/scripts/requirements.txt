@@ -4,4 +4,4 @@
 #
 # sqflint es OPCIONAL: si no está instalado, el motor reporta
 # SQFLINT_NO_DISPONIBLE y el análisis se marca NO VERIFICADO.
-sqflint>=0.3.2
+# sqflint>=0.3.2

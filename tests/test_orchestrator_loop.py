@@ -50,7 +50,7 @@ def test_input_file_populates_state(tmp_path: Path):
 def test_t09_abort_writes_failed_state(tmp_path: Path):
     """Demuestra que 3 iteraciones consecutivas con bloqueante escriben estado fallido y retornan código 1."""
     plugin_root = Path(__file__).resolve().parent.parent
-    fake_linter = plugin_root / "skills" / "arma3-sqf-skill" / "scripts" / "fake_linter.py"
+    fake_linter = plugin_root / "tests" / "fixtures" / "fake_linter.py"
 
     def agent_always_errors(prompt: str) -> str:
         # Devuelve código que el fake_linter detecta como SYNTAX_ERROR

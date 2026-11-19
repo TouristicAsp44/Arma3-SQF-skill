@@ -65,7 +65,7 @@ desktop.ini
 skills/arma3-sqf-skill/references/wiki-cache.md
 
 # Trazas crudas de evaluación (PR-1 1.n-bis): pueden contener código del
-# usuario. Lo que se versiona es docs/QUALITY.md (agregado) y evals/samples/.
+# usuario. Lo que se versiona es docs/QUALITY.md (agregado).
 evals/runs/
 
 # Material histórico congelado: no se versiona ni se empaqueta (PR-1 1.n)
@@ -77,7 +77,7 @@ legacy/
 *.db-journal
 *.db-wal
 
-# Archivos de planificacion y proceso descartados (PR-7)
+# Archivos de planificacion y proceso descartados (PR-7 / PR-8)
 PLAN-IMPROVEMENTS*.md
+PLAN-PR*.md
 docs/INSTRUCCION-ANTIGRAVITY-PR*.md
-!docs/INSTRUCCION-ANTIGRAVITY-PR7.md

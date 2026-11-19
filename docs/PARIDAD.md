@@ -83,7 +83,7 @@ Leyenda de estado:
 | 6 | Google Gemini | `integrations/gemini/system_instruction.md` | Adaptador Host (Degradado) | `PORTADO` | System instruction en texto plano con paquete P1–P4 |
 | 7 | Paquete inline P1–P4 | `scripts/generate_inline_packages.py` | Generador determinista | `PORTADO` | Generación determinista con verificación CLI `--check` y lock file |
 | 8 | Matriz de compatibilidad | `docs/COMPATIBILIDAD.md` | Documentación normativa | `PORTADO` | 6 hosts x 8 columnas completas con fallback universal |
-| 9 | Smoke tests S1–S3 | `evals/smoke/` + `run_smoke.py` | Fixtures y Runner | `PORTADO` | Fixtures de prueba, trazas, 0 falsos pasa, honestidad técnica R1 |
+| 9 | Smoke tests S1–S3 | `evals/smoke/` + `run_smoke.py` | Fixtures y Runner | `RETIRADO` | Subsistema preliminar retirado y consolidado en el arnés formal de 20 goldens (PR-8). |
 
 ## E. Evals Formales, Goldens y Calidad (PR-5)
 
@@ -93,7 +93,7 @@ Leyenda de estado:
 | 2 | Harness de Evaluación | `evals/harness.py` | Arnés de medición | `PORTADO` | M1 script (100 %); M2/M3 con denominadores separados; soporte de dos bloques independientes (`signaled` / `unsignaled`); verificación sha256 del contexto (R3) |
 | 3 | Protocolo de Ejecución | `evals/GOLDENS-PROTOCOL.md` | Guía de reproducción | `PORTADO` | Guion para ejecutar en host externo con traza reproducible |
 | 4 | Informe de Calidad | `docs/QUALITY.md` | Documentación generada | `PORTADO` | Generado por harness en 2 bloques: Bloque 1 (Señalizado, 14 goldens) y Bloque 2 (Ciego, 6 goldens). M1 100 %; Bloque 1: M2 83,3 % y M3 38/39 (97,4 %) — ambos NO PASA OBJETIVO; Bloque 2: M2 100 %, M3 21/21 (100 %, 0 falsos PASA). Cobertura completa en Antigravity; resto de hosts NO VERIFICADO (R1) |
-| 5 | Resultados Smoke auditados | `docs/SMOKE-RESULTS.md` | Documentación generada | `PORTADO` | Fila hardcodeada retirada; respaldado por trazas y tests |
+| 5 | Resultados Smoke auditados | `docs/SMOKE-RESULTS.md` | Documentación generada | `RETIRADO` | Subsistema preliminar retirado y consolidado en el arnés formal de 20 goldens (PR-8). |
 | 6 | Medición real en host (PR-5-bis / Track C) | `evals/runs/2026-11-18/antigravity/` + `docs/QUALITY.md` | Evidencia de ejecución | `PORTADO Y VERIFICADO` | 120 trazas reales: 84 en señalizado (14x2x3) + 36 en ciego (6x2x3). Cobertura completa en ambos bloques y modos (100 % reproducibles R3) |
 
 

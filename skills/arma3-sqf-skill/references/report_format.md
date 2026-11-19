@@ -34,8 +34,8 @@ RESUMEN: bloqueantes=N; sugerencias=N; no_verificado=N
 
 ```
 REPORT_SCHEMA_VERSION: 1
-[BLOQUEANTE] fixtures/test_scope.sqf:1 (Scope): Local variable "_z" is not from this scope (not private)
-[SUGERENCIA] fixtures/test_scope.sqf:1 (Sintaxis): Variable "_y" not used
+[BLOQUEANTE] fn_init.sqf:1 (Scope): Local variable "_z" is not from this scope (not private)
+[SUGERENCIA] fn_init.sqf:1 (Sintaxis): Variable "_y" not used
 RESUMEN: bloqueantes=1; sugerencias=1; no_verificado=0
 ```
 

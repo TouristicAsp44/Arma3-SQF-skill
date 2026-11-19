@@ -10,7 +10,7 @@ assignees: ""
 Una descripción clara de cuál es el problema o limitación actual.
 
 **Solución o mejora propuesta**
-Describe de forma clara y detallada qué te gustaría que haga el plugin o qué regla SQF debería añadirse.
+Describe de forma clara y detallada qué te gustaría que haga la skill o qué regla SQF debería añadirse.
 
 **Framework / Mod afectado**
 - [ ] Arma 3 Vanilla

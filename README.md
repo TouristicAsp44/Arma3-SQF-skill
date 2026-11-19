@@ -1,4 +1,4 @@
-# Arma 3 SQF Skill — `arma3-sqf-skill`
+# Arma3-SQF-skill
 
 <p align="center">
   <img src="assets/logo.png" alt="Arma 3 SQF Skill Logo" width="180">
@@ -11,7 +11,7 @@
 <p align="center">
   <a href="https://github.com/TouristicAsp44/Arma3-SQF-skill/releases/tag/v1.0.0"><img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="Versión 1.0.0"></a>
   <img src="https://img.shields.io/badge/Python-3.11+-blue.svg" alt="Python 3.11+">
-  <img src="https://img.shields.io/badge/Tests-145%20passing-brightgreen.svg" alt="Tests">
+  <img src="https://img.shields.io/badge/Tests-146%20passing-brightgreen.svg" alt="Tests">
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
   <img src="https://img.shields.io/badge/Arma%203-Vanilla%20%7C%20CBA%20%7C%20ACE3-orange.svg" alt="Arma 3">
   <a href="https://github.com/TouristicAsp44/Arma3-SQF-skill"><img src="https://img.shields.io/badge/GitHub-TouristicAsp44%2FArma3--SQF--skill-informational.svg" alt="Repositorio"></a>
@@ -30,28 +30,28 @@
 
 - **Origen del proyecto:** Port modular e independiente del plugin [`arma3-sqf-review`](https://github.com/TouristicAsp44/Arma3-SQF-review) de Google Antigravity, desarrollado originalmente por el mismo autor ([TouristicAsp44](https://github.com/TouristicAsp44)) bajo licencia MIT.
 - **Motivo de la separación:** La skill `arma3-sqf-skill` está diseñada para ser **universal y portable** a múltiples hosts de IA (Claude Code/Desktop, Cursor, OpenAI Codex, ChatGPT Custom GPTs, Google Gemini y Antigravity), eliminando la dependencia obligatoria de un runtime multi-agente cerrado. El plugin original `arma3-sqf-review` permanece intacto en su propio repositorio y ambos conviven de forma independiente.
-- **Estado y madurez técnica:** Versión estable `1.0.0` (2026-11-19). La suite contiene 145 pruebas automatizadas, 20 goldens de evaluación formal (14 señalizados y 6 ciegos) y 120 trazas reales verificadas mediante hash SHA-256 de contexto cargado (Regla R3). Solo el entorno Antigravity ha sido medido empíricamente; los restantes 6 hosts se declaran estrictamente como `NO VERIFICADO` conforme a la Regla de Honestidad Técnica (R5).
+- **Estado y madurez técnica:** Versión estable `1.0.0` (2026-11-19). La suite contiene 146 pruebas automatizadas, 20 goldens de evaluación formal (14 señalizados y 6 ciegos) y 120 trazas reales verificadas mediante hash SHA-256 de contexto cargado (Regla R3). Solo el entorno Antigravity ha sido medido empíricamente; los restantes 6 hosts se declaran estrictamente como `NO VERIFICADO` conforme a la Regla de Honestidad Técnica (R5).
 - **Lo que NO incluye:** No empaqueta el dataset offline `a3ref` (opcionalmente clonable por el usuario), no incluye binarios compilados de plataforma como `sqflint` (opcional), ni contiene dependencias externas en tiempo de ejecución (`dependencies = []`, solo biblioteca estándar de Python >= 3.11).
 
-### Tabla de Diferencias: Skill (`arma3-sqf-skill`) vs Plugin Original (`arma3-sqf-review`)
+### Tabla de Diferencias: Skill (`Arma3-SQF-skill`) vs Plugin Original (`arma3-sqf-review`)
 
 La siguiente comparativa resume las dimensiones arquitectónicas auditadas en [`docs/PARIDAD.md`](docs/PARIDAD.md):
 
-| Dimensión / Eje | Skill Universal (`arma3-sqf-skill`) | Plugin Original (`arma3-sqf-review`) |
+| Dimensión | Skill (`Arma3-SQF-skill`) | Plugin original (`arma3-sqf-review`) |
 | :--- | :--- | :--- |
-| **Propósito y alcance** | Skill portable de análisis y revisión SQF para cualquier LLM o IDE moderno. | Plugin de extensión colegiado exclusivo para el entorno Google Antigravity. |
-| **Hosts soportados** | 6 hosts: Claude Code/Desktop, Cursor, OpenAI Codex, ChatGPT, Gemini, Antigravity. | Exclusivo de Google Antigravity (requiere su runtime de subagentes). |
-| **Orquestación** | Prompt en capas (`SKILL.md`: Capas 0–3), 6 lentes y 5 workflows bajo demanda. | Sistema de 11 subagentes autónomos coordinados por un agente orquestador. |
-| **Motor determinista** | `sqf_orchestrator.py` con triage de modos (`--mode-query`), linting (`--lint`) y contrato v1. | Scripts de soporte acoplados al harness de Antigravity. |
-| **Categorías y rigor** | 7 categorías formales de BLOQUEANTE, esquema v1 (`REPORT_SCHEMA_VERSION: 1`), límite 3 ciclos. | 7 categorías formales de BLOQUEANTE, límite 3 ciclos (T09). |
-| **Fuente canónica de reglas** | Centralizada en `references/invariants.md`, `sqf-standards.md` y `rubrica.md` (R2/R6). | Fragmentada originalmente en `rules/AGENTS.md` y prompts de subagentes. |
-| **Wiki y procedencia** | Base SQLite determinista (`arma3_wiki.db`, FTS5/LIKE, ~130x–520x más rápida) + JSON original. | Lectura de árboles JSON de `a3ref` en disco sin indexación relacional. |
-| **Servidor MCP** | Servidor nativo JSON-RPC 2.0 sobre `stdio` (`scripts/mcp_server.py`, stdlib pura). | Integración de herramientas MCP mediante sidecars propios de Antigravity. |
-| **Integraciones por host** | Adaptadores listos en `integrations/{claude,cursor,openai,chatgpt,gemini}/`. | Manifiesto `plugin.json` y subagentes en `agents/`. |
-| **Evaluación formal** | Arnés formal (`evals/harness.py`), 20 goldens (señalizados y ciegos), 120 trazas, métricas M1/M2/M3. | Pruebas de smoke operativas y validaciones manuales. |
-| **Dependencias runtime** | `dependencies = []` (cero librerías externas; Python stdlib >= 3.11 puro). | Python stdlib + plataforma Antigravity. |
-| **Instalación** | Git clone, adaptadores de prompt o paquete inline; opcionalmente como plugin. | Instalación a través del gestor de plugins de Antigravity. |
-| **Licencia y autor** | MIT — TouristicAsp44. | MIT — TouristicAsp44. |
+| **Propósito y público** | Skill portable de análisis y revisión SQF para cualquier host de IA. | Plugin de extensión colegiado para el entorno cerrado de Antigravity. |
+| **Entornos soportados** | 6 hosts: Claude Code/Desktop, Cursor, Codex, ChatGPT, Gemini, Antigravity. | Exclusivo de Antigravity (runtime propietario de subagentes). |
+| **Orquestación** | `SKILL.md` en capas (0–3), 6 lentes y 5 workflows modulares bajo demanda. | 11 subagentes autónomos coordinados por un orquestador. |
+| **Motor determinista** | Mismo motor heredado (`sqf_orchestrator.py`, Cat. 1–2) **expuesto por CLI** (`--lint`, `--mode-query`) y con contrato de informe v1. | El mismo `sqf_orchestrator.py`, acoplado al flujo interno de los agentes y sin CLI documentada. |
+| **Categorías y rigor** | 7 categorías de BLOQUEANTE, esquema v1 (`REPORT_SCHEMA_VERSION: 1`), 3 ciclos. | 7 categorías de BLOQUEANTE y 3 ciclos (T09) ejecutados por los agentes. |
+| **Fuente canónica** | Única y centralizada: `references/invariants.md`, `rubrica.md`, `sqf-standards.md` (R2/R6). | Reglas repartidas entre `rules/AGENTS.md` y los prompts de los subagentes. |
+| **Wiki y datos** | Réplica `a3ref` **más** índice SQLite con FTS5 (130x–520x más rápido). | Lectura directa del JSON de `a3ref` mediante `sqf_wiki_reader.py`; **sin** base de datos. |
+| **Transporte MCP** | Servidor JSON-RPC 2.0 propio sobre `stdio` (`mcp_server.py`, stdlib pura). | **Sin** servidor MCP propio. |
+| **Integraciones** | `integrations/{claude,cursor,openai,chatgpt,gemini,common}/` (14 ficheros). | `plugin.json` + `agents/` para su instalación como plugin. |
+| **Evaluación y evidencia** | Arnés formal (`evals/harness.py`), 20 goldens (14 señalizados + 6 ciegos), 120 trazas, métricas M1/M2/M3 con estados `PASA` / `NO PASA OBJETIVO` / `NO VERIFICADO`. | Suite de pruebas unitarias (7 ficheros) y `references/run_sqflint.py`; **sin** arnés de goldens ni métricas. |
+| **Dependencias runtime** | `dependencies = []` — solo biblioteca estándar de Python ≥ 3.11. | Biblioteca estándar + runtime propietario de Antigravity. |
+| **Instalación** | Clone + adaptadores por host, o paquetes inline P1–P4 para hosts sin ficheros. | Instalación como plugin de Antigravity. |
+| **Procedencia y licencia** | MIT · TouristicAsp44. Port independiente y desacoplado. | MIT · TouristicAsp44. Repositorio original. |
 
 ---
 
@@ -209,7 +209,7 @@ Para validar comandos y funciones offline con exactitud criptográfica, clona `a
 
 ## 🧪 Arnés de Pruebas
 
-El repositorio cuenta con una suite integral de 145 pruebas automatizadas que validan análisis sintáctico, resolución de enlaces relativos, paridad de agentes, base SQLite y contratos del servidor MCP:
+El repositorio cuenta con una suite integral de 146 pruebas automatizadas que validan análisis sintáctico, resolución de enlaces relativos, paridad de agentes, base SQLite y contratos del servidor MCP:
 
 ```bash
 python -m pytest tests/ -q

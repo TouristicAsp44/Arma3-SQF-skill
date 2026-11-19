@@ -17,7 +17,7 @@ Si aplica, incluye el fragmento de código SQF que causa el fallo:
 ```
 
 **Comportamiento esperado**
-Qué debería haber reportado o hecho el plugin.
+Qué debería haber reportado o hecho la skill.
 
 **Modo de ejecución**
 - [ ] Micro
@@ -27,7 +27,7 @@ Qué debería haber reportado o hecho el plugin.
 
 **Entorno:**
 - Versión de Python:
-- Versión del Plugin: 1.1.0
+- Versión de la Skill: 1.0.0
 - Sistema Operativo: [Windows / Linux / macOS]
 - ¿Tiene sqflint instalado?: [Sí / No]
 - ¿Usa réplica a3ref?: [Sí / No]

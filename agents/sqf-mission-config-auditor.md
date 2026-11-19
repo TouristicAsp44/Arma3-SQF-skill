@@ -21,7 +21,7 @@ Ruta raíz del proyecto y perfil (`DESTINO: mision` o `DESTINO: addon`).
 - **Si el perfil es Misión (`DESTINO: mision`)**:
   * Archivo de configuración: `description.ext`. Si no existe, decláralo y termina: no supongas valores por defecto sin decirlo.
   * Ciclo de vida: `init.sqf`, `initServer.sqf`, `initPlayerLocal.sqf`, `initPlayerServer.sqf`.
-  * **Invariante de Misión**: NUNCA exijas ni penalices la ausencia de `CfgPatches`, prefijos `$PBOPREFIX$`, empaquetado PBO ni parámetros de mod (`-serverMod`). Una misión reside en la carpeta de misiones de Eden/MP.
+  * **Invariante de Misión**: NUNCA exijas ni penalices la ausencia de `CfgPatches`, prefijos `$PBOPREFIX$`, empaquetado PBO ni parámetros de mod (`-serverMod`). Una misión reside en la carpeta de misiones de escenario o MPMissions.
 
 - **Si el perfil es Addon (`DESTINO: addon`)**:
   * Archivo de configuración: `config.cpp` (o `config.bin`). Si no existe, decláralo y termina.

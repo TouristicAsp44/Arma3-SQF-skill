@@ -17,7 +17,6 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 # Ficheros que describen la HISTORIA del port y pueden citar el nombre antiguo.
 HISTORY_ALLOWED = (
-    "docs/INSTRUCCION-ANTIGRAVITY-PR7.md",
     "docs/PARIDAD.md",
 )
 
