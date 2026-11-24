@@ -112,9 +112,11 @@ def test_claude_desktop_snippet_contract_with_cli() -> None:
         script_file = REPO_ROOT / script_rel
         assert script_file.is_file(), f"El script {script_rel} apuntado por {name} no existe"
 
-        # 2. Cada flag en args existe en el parser del orquestador
+        # 2. Cada flag en args existe en el parser del orquestador (CLI pura con --mode-query o --lint)
         flags = [a for a in args[1:] if a.startswith("--")]
-        assert "--serve-mcp" in flags, f"El flag --serve-mcp no está presente en args de {name}"
+        assert any(f in ("--mode-query", "--lint") for f in flags), (
+            f"Se esperaba flag CLI puro (--mode-query o --lint) en args de {name}"
+        )
         for flag in flags:
             assert f'"{flag}"' in orch_code or f"'{flag}'" in orch_code, (
                 f"El flag {flag} de {name} no existe en argparse de {script_rel}"

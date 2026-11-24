@@ -4,6 +4,52 @@ Todas las novedades relevantes de esta skill se documentan aquí.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el versionado
 semántico ([SemVer](https://semver.org/lang/es/)).
 
+## [2.0.0] — 2026-11-23
+
+Transformación mayor de arquitectura hacia **Skill Pura Universal (Agent Skill)** completamente desacoplada de servidores en segundo plano (Cero MCP), con 0 dependencias externas runtime (`dependencies = []`, 100% Python stdlib pura), presupuesto estricto de tokens de contexto (Capa 0: 1.091 tokens), estructura plana de referencias de 1 solo salto, soporte integral para Claude AI (con sandbox Linux), ChatGPT (Custom GPTs / Assistants), Gemini, Cursor y ejecución CLI local.
+
+### Añadido
+
+- **Empaquetado distribuible autónomo (`arma3-sqf-skill.zip`)**: Paquete autocontenido de distribución (113,8 KB, estrictamente < 150 KB) estructurado bajo raíz única canónica `arma3-sqf-skill/`, con terminaciones de línea 100% LF estricto y codificación UTF-8 sin BOM.
+- **Lentes secuenciales planos (Capa 1 a 1 solo nivel)**: Reorganización y formalización de 6 lentes de análisis en `skills/arma3-sqf-skill/references/`:
+  - `lens-architect.md`: Arquitectura modular, fronteras de componentes y contratos `params`.
+  - `lens-best-practices.md`: Buenas prácticas SQF, evaluación perezosa y nomenclatura.
+  - `lens-claims.md`: Verificación rigurosa de comandos SQF y erradicación de alucinaciones contra BIKI (`a3ref`).
+  - `lens-config.md`: Configuraciones de misión/addon (`description.ext`, `config.cpp`, `CfgRemoteExec`, `CfgFunctions`).
+  - `lens-locality.md`: Auditoría de multijugador, locality AL/AG/EL/EG, Dedicated Server, Headless Client y JIP.
+  - `lens-performance.md`: Profiling estático, scheduler vs unscheduled, PFH y optimización de bucles.
+- **Wrapper tolerante de compilador (`skills/arma3-sqf-skill/scripts/run_sqflint.py`)**: Detección dinámica de `sqflint` con degradación elegante a código de salida 3 (`SQFLINT_NO_DISPONIBLE`) y registro de estado `[NO_VERIFICADO]` ante ausencia del binario externo.
+- **Script de automatización para Claude AI (`skills/arma3-sqf-skill/scripts/bootstrap.sh`)**: Paso 0 desatendido para clonado superficial (`--depth 1`) de `a3ref` en `~/.a3ref_cache/`, compilación de base SQLite FTS5 y exportación de variables de entorno con permisos de ejecución POSIX (`100755`).
+- **Cadena de resolución agnóstica de 4 niveles en `sqf_wiki_reader.py`**:
+  1. Variable de entorno `SQF_WIKI_DB_PATH`.
+  2. Ruta local `./arma3_wiki.db` y directorio de usuario `~/.a3ref/arma3_wiki.db` (multiplataforma Windows y Linux).
+  3. Fallback dinámico para contenedor de Claude AI (`~/.a3ref_cache/arma3_wiki.db`).
+  4. Modo degradado `SIN_REPLICA` consultando la tabla canónica de 31 comandos en `references/wiki-cache.md` y emitiendo honestamente `[NO_VERIFICADO]` ante comandos fuera de réplica.
+- **Formateo sintético bajo demanda en `sqf_wiki_reader.py`**: Extractos técnicos concisos (< 200 tokens: firma, argumentos, localidad, retorno, versión y resumen), reservando `--full` para volcados exhaustivos JSON (>97% de ahorro en tokens de contexto).
+- **Manifiesto de interfaz OpenAI (`skills/arma3-sqf-skill/agents/openai.yaml`)**: Especificación formal de Custom GPTs y Assistants.
+- **Entregables universales de despliegue**:
+  - `README-INSTALL.md`: Guía de instalación paso a paso en Claude AI, ChatGPT, Cursor y uso CLI.
+  - `COMPATIBILITY-REPORT.md`: Matriz formal de conformidad normativa contra estándares de Claude AI y OpenAI.
+  - `TRACEABILITY.md`: Trazabilidad técnica 1:1 entre los 11 subagentes originales, las 7 categorías P0 y la nueva Skill Pura.
+  - `scripts/package_skill.py`: Script determinista para empaquetado y validación de integridad del ZIP distribuible.
+
+### Cambiado
+
+- **Capa 0 (`skills/arma3-sqf-skill/SKILL.md`) ultra-compacta**: Rediseñada con Frontmatter YAML canónico estricto de 107 tokens (solo `name` y `description` técnica) y cuerpo de 1.091 tokens (cumpliendo el presupuesto estricto ≤ 1.100 tokens), estructurado en 11 secciones normativas.
+- **Optimización de activos gráficos (`assets/logo.png`)**: Reescalado y cuantización de alta fidelidad, reduciendo su peso de 1.029,7 KB (1,03 MB) a **43,2 KB** (>95% de reducción).
+- **Condensación de invariantes (`skills/arma3-sqf-skill/references/invariants.md`)**: Reducción de 14,2 KB a 10,3 KB (~3.139 tokens) manteniendo intactas las 7 categorías de Bloqueantes P0 y reglas P1–P4.
+- **Orquestador CLI (`skills/arma3-sqf-skill/scripts/sqf_orchestrator.py`)**: Desacoplado 100% de transporte de red/pipes; salida estandarizada bajo `REPORT_SCHEMA_VERSION: 1` (`PASA`, `BLOQUEANTE`, `SUGERENCIA`, `NO_VERIFICADO`).
+- **Constructor de base de datos (`skills/arma3-sqf-skill/scripts/wiki_db_builder.py`)**: Añadido soporte para `--output-dir` dinámico en rutas escribibles arbitrarias, ejecución silenciosa (`--quiet`) y protección estricta contra escrituras en carpetas de solo lectura.
+- **Suite de pruebas de regresión**: Actualizada a **148 tests unitarios** (100% passing) tras el retiro de pruebas acopladas a MCP e incorporación de tests para CLI pura, códigos de salida y degradación.
+
+### Eliminado
+
+- **Servidor MCP (`skills/arma3-sqf-skill/scripts/mcp_server.py`) y flags `--serve-mcp`**: Erradicación de la capa de servidor JSON-RPC/stdio y dependencias asociadas (`anyio`) para garantizar pureza e independencia de procesos.
+- **Dumps de corridas históricas (`evals/runs/`)**: Purgados los 120 archivos JSON (~2,66 MB) que amenazaban la ventana de contexto ante búsquedas globales por globbing.
+- **Directorio `legacy/`**: Eliminación completa de snapshots obsoletos de agentes.
+- **Subcarpeta anidada `skills/arma3-sqf-skill/references/lenses/`**: Aplanada a favor de archivos directos de 1 solo salto (`references/lens-*.md`).
+- **Residuos de empaquetado y desarrollo**: Eliminados `dist/`, `.coverage`, cachés `.pytest_cache/`, `.ruff_cache/`, `egg-info/`, carpetas `__pycache__` y archivos ajenos (`ANALISIS_LOADOUT_FUSION_TOOL_ARMA_3.md`).
+
 ## [1.0.0] — 2026-11-19
 
 Primera versión estable de la **skill universal** derivada del plugin `arma3-sqf-review`

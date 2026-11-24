@@ -4,6 +4,8 @@ Etapa 3 (R2): Bucle de validación interactiva, linter como subprocess, y
 archivo de notas. Todo anclado al directorio de trabajo experimental.
 """
 
+from __future__ import annotations
+
 import argparse
 import datetime
 import json
@@ -12,9 +14,21 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 from collections.abc import Callable
+from pathlib import Path
+
+# Compatibilidad estricta con entornos de solo lectura y prevención de .pyc
+os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
+sys.dont_write_bytecode = True
+
+# Resolución CWD-independiente mediante Path(__file__).resolve().parent
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
 
 from sqf_models import (
+    REPORT_SCHEMA_VERSION,
     SQFFinding,
     check_escalation_needed_for_files,
     determine_escalation_reason,
@@ -31,13 +45,37 @@ from sqf_wiki_reader import (
     update_wiki,
 )
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-# Ruta relativa al propio script. Una ruta absoluta a una maquina concreta hacia que
-# el plugin no arranque en ningun otro equipo, y hacia que el linter se reporte
-# como "no disponible" aunque este perfectamente instalado.
-DEFAULT_LINTER = os.path.normpath(
-    os.path.join(SCRIPT_DIR, "..", "references", "run_sqflint.py")
-)
+
+def resolve_default_linter() -> str:
+    """Resuelve la ruta al wrapper run_sqflint de forma agnóstica al CWD.
+
+    Prioriza scripts/run_sqflint.py (ubicación canónica centralizada) y
+    mantiene fallback a references/run_sqflint.py.
+    """
+    scripts_wrapper = SCRIPT_DIR / "run_sqflint.py"
+    if scripts_wrapper.is_file():
+        return str(scripts_wrapper)
+    references_wrapper = SCRIPT_DIR.parent / "references" / "run_sqflint.py"
+    if references_wrapper.is_file():
+        return str(references_wrapper)
+    return str(scripts_wrapper)
+
+
+DEFAULT_LINTER = resolve_default_linter()
+
+
+def _is_dir_writable(path: str | Path) -> bool:
+    """Verifica si un directorio existe y es escribible."""
+    try:
+        p = Path(path)
+        if not p.exists():
+            p.mkdir(parents=True, exist_ok=True)
+        test_file = p / f".write_test_{os.getpid()}"
+        test_file.write_text("test", encoding="utf-8")
+        test_file.unlink(missing_ok=True)
+        return True
+    except OSError:
+        return False
 
 
 def default_mock_agent(prompt: str) -> str:
@@ -246,14 +284,17 @@ def _build_notes_content(findings: list[SQFFinding], iteration: int) -> str:
     return "\n".join(lines)
 
 
-def _archive_previous_notes(resolved_notes_file: str, resolved_archived_notes_dir: str):
+def _archive_previous_notes(resolved_notes_file: str, resolved_archived_notes_dir: str) -> None:
     if not os.path.exists(resolved_notes_file):
         return
-    os.makedirs(resolved_archived_notes_dir, exist_ok=True)
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    archived_path = os.path.join(resolved_archived_notes_dir, f"notas_revision_{timestamp}.txt")
-    shutil.move(resolved_notes_file, archived_path)
-    print(f"Notas archivadas en {archived_path}.")
+    try:
+        os.makedirs(resolved_archived_notes_dir, exist_ok=True)
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        archived_path = os.path.join(resolved_archived_notes_dir, f"notas_revision_{timestamp}.txt")
+        shutil.move(resolved_notes_file, archived_path)
+        print(f"Notas archivadas en {archived_path}.")
+    except OSError as e:
+        print(f"Aviso (sistema de solo lectura): no se pudo archivar notas previas: {e}", file=sys.stderr)
 
 
 def _run_linter_on_code(
@@ -263,12 +304,17 @@ def _run_linter_on_code(
     iteration: int,
     timeout: int,
 ) -> tuple[int, str]:
+    """Ejecuta el linter sobre un código SQF temporal con tolerancia a solo lectura y linter ausente."""
+    target_dir = resolved_work_dir if _is_dir_writable(resolved_work_dir) else tempfile.gettempdir()
     temp_filename = f"_temp_orchestrator_{os.getpid()}_{iteration}.sqf"
-    temp_sqf_path = os.path.abspath(os.path.join(resolved_work_dir, temp_filename))
+    temp_sqf_path = os.path.abspath(os.path.join(target_dir, temp_filename))
 
     try:
         with open(temp_sqf_path, "w", encoding="utf-8") as tf:
             tf.write(code)
+
+        if not os.path.exists(resolved_linter):
+            return 3, f"SQFLINT_NO_DISPONIBLE: ejecutable del linter no encontrado en {resolved_linter}"
 
         env = os.environ.copy()
         env["PYTHONDONTWRITEBYTECODE"] = "1"
@@ -288,6 +334,10 @@ def _run_linter_on_code(
             return proc.returncode, proc.stdout
         except subprocess.TimeoutExpired:
             return 3, "TIMEOUT EXPIRED: El linter superó el tiempo límite."
+        except (subprocess.SubprocessError, OSError) as e:
+            return 3, f"SQFLINT_NO_DISPONIBLE: error al invocar linter ({e})"
+    except OSError as e:
+        return 3, f"SQFLINT_NO_DISPONIBLE: error de E/S en entorno de ejecución ({e})"
     finally:
         if os.path.exists(temp_sqf_path):
             try:
@@ -297,7 +347,7 @@ def _run_linter_on_code(
 
 
 def _process_iteration_results(
-    findings_objs: list,
+    findings_objs: list[SQFFinding],
     state: dict,
     iteration: int,
     max_iterations: int,
@@ -308,41 +358,68 @@ def _process_iteration_results(
     mode: str,
 ) -> int:
     bloqueantes = [f for f in findings_objs if f.severity == "BLOQUEANTE"]
+    has_no_verificado = any(f.severity == "NO_VERIFICADO" for f in findings_objs)
     print(f"Iteración {iteration}: {len(findings_objs)} hallazgos ({len(bloqueantes)} bloqueantes).")
 
     notes_content = _build_notes_content(findings_objs, iteration)
-    with open(resolved_notes_file, "w", encoding="utf-8") as nf:
-        nf.write(notes_content)
-    print(f"Notas de revisión actualizadas en {resolved_notes_file}.")
+    try:
+        with open(resolved_notes_file, "w", encoding="utf-8") as nf:
+            nf.write(notes_content)
+        print(f"Notas de revisión actualizadas en {resolved_notes_file}.")
+    except OSError as e:
+        print(f"Aviso (sistema de solo lectura): no se pudo escribir notas de revisión: {e}", file=sys.stderr)
 
     if not bloqueantes and not dry_run:
+        if has_no_verificado:
+            print("Iteración sin bloqueantes pero con verificaciones pendientes (NO_VERIFICADO).")
+            print("ESTADO: NO VERIFICADO")
+            state["status"] = "NO_VERIFICADO"
+            state["findings"] = [f.model_dump() for f in findings_objs]
+            try:
+                with open(resolved_state_file, "w", encoding="utf-8") as sf:
+                    json.dump(state, sf, indent=2)
+            except OSError:
+                pass
+            return 10
+
         print("Iteración sin bloqueantes. Validación exitosa.")
+        print("ESTADO: PASA")
         state["status"] = "EXITOSO"
         state["findings"] = [f.model_dump() for f in findings_objs]
-        with open(resolved_state_file, "w", encoding="utf-8") as sf:
-            json.dump(state, sf, indent=2)
+        try:
+            with open(resolved_state_file, "w", encoding="utf-8") as sf:
+                json.dump(state, sf, indent=2)
+        except OSError:
+            pass
         return 0
 
     if dry_run and not bloqueantes:
         print("Dry-run sin bloqueantes: el mock agent no valida código real.")
-        print("Estado: NO VERIFICADO (simulacion con mock agent)")
+        print("ESTADO: NO VERIFICADO")
         state["status"] = "NO_VERIFICADO"
         state["findings"] = [f.model_dump() for f in findings_objs]
-        with open(resolved_state_file, "w", encoding="utf-8") as sf:
-            json.dump(state, sf, indent=2)
+        try:
+            with open(resolved_state_file, "w", encoding="utf-8") as sf:
+                json.dump(state, sf, indent=2)
+        except OSError:
+            pass
         return 10
 
     if iteration >= max_iterations:
         print(f"Se alcanzó el límite máximo de {max_iterations} iteraciones con bloqueantes abiertos.")
         print("PUERTA DE CALIDAD INFRANQUEABLE (T09): DETENIDO (NO PASA).")
+        print("ESTADO: BLOQUEANTE")
         state["status"] = "FALLIDO"
         state["iteration"] = iteration
         state["findings"] = [f.model_dump() for f in findings_objs]
         state["bloqueantes_abiertos"] = len(bloqueantes)
 
-        with open(resolved_failed_file, "w", encoding="utf-8") as ff:
-            json.dump(state, ff, indent=2)
-        print(f"Estado fallido guardado en {resolved_failed_file}.")
+        try:
+            with open(resolved_failed_file, "w", encoding="utf-8") as ff:
+                json.dump(state, ff, indent=2)
+            print(f"Estado fallido guardado en {resolved_failed_file}.")
+        except OSError as e:
+            print(f"Aviso (sistema de solo lectura): no se pudo guardar estado fallido: {e}", file=sys.stderr)
 
         if os.path.exists(resolved_state_file):
             try:
@@ -352,11 +429,15 @@ def _process_iteration_results(
         return 1
 
     print(f"Bloqueantes pendientes. Guarda estado para iteración {iteration + 1}.")
+    print("ESTADO: BLOQUEANTE")
     state["iteration"] = iteration + 1
     state["status"] = "EN_PROGRESO"
     state["findings"] = [f.model_dump() for f in findings_objs]
-    with open(resolved_state_file, "w", encoding="utf-8") as sf:
-        json.dump(state, sf, indent=2)
+    try:
+        with open(resolved_state_file, "w", encoding="utf-8") as sf:
+            json.dump(state, sf, indent=2)
+    except OSError:
+        pass
     return 0
 
 
@@ -397,8 +478,18 @@ def run_orchestrator(
     mode: str | None = None,
     timeout: int = 30,
 ) -> int:
-    resolved_work_dir = os.path.abspath(work_dir) if work_dir else os.getcwd()
-    os.makedirs(resolved_work_dir, exist_ok=True)
+    if work_dir:
+        resolved_work_dir = os.path.abspath(work_dir)
+        try:
+            os.makedirs(resolved_work_dir, exist_ok=True)
+        except OSError:
+            pass
+    else:
+        cwd = os.getcwd()
+        if _is_dir_writable(cwd):
+            resolved_work_dir = os.path.abspath(cwd)
+        else:
+            resolved_work_dir = tempfile.gettempdir()
 
     resolved_state_file = (
         os.path.abspath(state_file)
@@ -422,7 +513,7 @@ def run_orchestrator(
     resolved_linter = (
         os.path.abspath(linter_executable)
         if linter_executable
-        else DEFAULT_LINTER
+        else resolve_default_linter()
     )
 
     if not dry_run and agent_func is None:
@@ -521,21 +612,18 @@ def mode_query(root: str | None = None) -> int:
             for f_name in sorted(f_names):
                 if f_name.lower().endswith(".sqf"):
                     full_p = os.path.join(r_dir, f_name)
-                    try:
-                        with open(full_p, "r", encoding="utf-8", errors="replace") as sqf_f:
-                            sqf_files[full_p] = sqf_f.read()
-                    except OSError:
-                        pass
+                    content, _ = read_sqf_file_robust(full_p)
+                    if content:
+                        sqf_files[full_p] = content
     elif resolved_root.lower().endswith(".sqf"):
-        try:
-            with open(resolved_root, "r", encoding="utf-8", errors="replace") as sqf_f:
-                sqf_files[resolved_root] = sqf_f.read()
-        except OSError:
-            pass
+        content, _ = read_sqf_file_robust(resolved_root)
+        if content:
+            sqf_files[resolved_root] = content
 
     try:
         mode = check_escalation_needed_for_files(sqf_files, "Micro")
     except ValueError as exc:
+        print(f"REPORT_SCHEMA_VERSION: {REPORT_SCHEMA_VERSION}")
         print("ESTADO: NO VERIFICADO")
         print(str(exc))
         print("No se decide ningun modo. Revisa la ruta de --root: el modo mas permisivo")
@@ -578,7 +666,7 @@ def run_lint(
             report = format_findings_report([finding], item_9_status="NO_VERIFICADO")
             print(report)
             print(f"\n{item_9}")
-            print("Estado: NO VERIFICADO (codificación no soportada)")
+            print("ESTADO: NO VERIFICADO")
             return 10
         source_code = content
         file_sources[resolved_target] = content
@@ -604,15 +692,23 @@ def run_lint(
                         file_sources[fpath] = content
 
         if not file_sources and not encoding_findings:
-            print("[NO_VERIFICADO] 0: (Sistema): no se encontraron archivos .sqf; el analisis no se ejecuto")
-            print("RESUMEN: bloqueantes=0; sugerencias=0; no_verificado=1")
+            finding = SQFFinding(
+                severity="NO_VERIFICADO",
+                file=resolved_target,
+                line=0,
+                description="no se encontraron archivos .sqf; el analisis no se ejecuto",
+                evidence="",
+                discipline="Sistema",
+            )
+            report = format_findings_report([finding], item_9_status="NO_VERIFICADO")
+            print(report)
             print("ESTADO: NO VERIFICADO")
             return 10
 
     resolved_linter = (
         os.path.abspath(str(linter_executable))
         if linter_executable
-        else DEFAULT_LINTER
+        else resolve_default_linter()
     )
     if not os.path.exists(resolved_linter):
         finding = SQFFinding(
@@ -630,7 +726,7 @@ def run_lint(
         report = format_findings_report([finding], item_9_status="NO_VERIFICADO")
         print(report)
         print(f"\n{item_9}")
-        print("Estado: NO VERIFICADO (el linter no está disponible)")
+        print("ESTADO: NO VERIFICADO")
         return 10
 
     env = os.environ.copy()
@@ -671,8 +767,17 @@ def run_lint(
     print(f"\n{item_9}")
 
     if any(f.severity == "NO_VERIFICADO" for f in findings) or rc == 3 or "SQFLINT_NO_DISPONIBLE" in stdout:
-        print("Estado: NO VERIFICADO (el linter no está disponible)")
+        print("ESTADO: NO VERIFICADO")
         return 10
+
+    bloqueantes = [f for f in findings if f.severity == "BLOQUEANTE"]
+    sugerencias = [f for f in findings if f.severity == "SUGERENCIA"]
+    if bloqueantes:
+        print("ESTADO: BLOQUEANTE")
+    elif sugerencias:
+        print("ESTADO: SUGERENCIA")
+    else:
+        print("ESTADO: PASA")
 
     return 0
 
@@ -706,15 +811,9 @@ def main():
                         help="Ruta personalizada a la base de datos de la wiki")
     parser.add_argument("--update-wiki", "--update", action="store_true",
                         help="Actualizar repositorios de la wiki")
-    parser.add_argument("--serve-mcp", action="store_true",
-                        help="Arranca el servidor MCP local sobre stdio (JSON-RPC 2.0).")
     parser.add_argument("files", nargs="*", help="Archivos o rutas adicionales.")
 
     args = parser.parse_args()
-
-    if args.serve_mcp:
-        from mcp_server import run_mcp_server_stdio
-        sys.exit(run_mcp_server_stdio())
 
     if args.wiki:
         wiki_root = resolve_wiki_root(args.wiki_path)

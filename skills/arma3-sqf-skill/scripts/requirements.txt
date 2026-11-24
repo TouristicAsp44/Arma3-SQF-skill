@@ -1,7 +1,0 @@
-# Dependencias de los scripts de `arma3-sqf-skill`.
-# El motor usa exclusivamente la biblioteca estándar de Python (>=3.11).
-# Dependencias consolidadas en la raíz: ../requirements.txt (PR-1 1.i).
-#
-# sqflint es OPCIONAL: si no está instalado, el motor reporta
-# SQFLINT_NO_DISPONIBLE y el análisis se marca NO VERIFICADO.
-# sqflint>=0.3.2

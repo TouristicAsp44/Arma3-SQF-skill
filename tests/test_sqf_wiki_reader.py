@@ -24,7 +24,15 @@ from enum import Enum
 from pathlib import Path
 
 from sqf_wiki_reader import (
+    clear_caches,
+    format_synthetic,
+    get_command,
+    get_db_resolution_level,
+    get_function,
+    is_degraded_mode,
+    load_wiki_cache_md,
     lookup_syntax_symbol,
+    resolve_wiki_db,
 )
 
 try:
@@ -207,3 +215,173 @@ def test_15_wrapper_rc3_no_verificado():
     assert len(findings) == 1
     assert findings[0].severity == "NO_VERIFICADO"
     assert findings[0].discipline == "Sintaxis"
+
+
+def test_16_synthetic_output_formatting():
+    """16. Formateo sintético de salida < 200 tokens con firma, argumentos, retorno, versión y resumen."""
+    cmd = get_command("remoteExec")
+    assert cmd is not None
+    synth = format_synthetic(cmd)
+
+    # Verifica campos requeridos
+    assert "Firma:" in synth
+    assert "Localidad:" in synth
+    assert "Arg:" in synth and "Efe:" in synth
+    assert "Retorno:" in synth
+    assert "Versión:" in synth
+    assert "Resumen:" in synth
+    assert "remoteExec" in synth
+
+    # Comprueba que el volumen es compacto (< 200 tokens, ~70 palabras)
+    word_count = len(synth.split())
+    assert word_count < 100, f"Salida sintética excede el umbral de tokens: {word_count} palabras"
+
+
+def test_17_db_resolution_chain_4_levels(tmp_path: Path, monkeypatch):
+    """17. Cadena de resolución agnóstica de 4 niveles para la base de datos SQLite."""
+    clear_caches()
+    empty_home = tmp_path / "empty_home"
+    empty_home.mkdir()
+
+    # Nivel 1: Variable de entorno SQF_WIKI_DB_PATH
+    fake_db = tmp_path / "custom.db"
+    fake_db.write_bytes(b"SQLite format 3\x00")
+    monkeypatch.setenv("SQF_WIKI_DB_PATH", str(fake_db))
+    tier, label, p = get_db_resolution_level()
+    assert tier == 1
+    assert label == "SQF_WIKI_DB_PATH"
+    assert p == fake_db
+    monkeypatch.delenv("SQF_WIKI_DB_PATH", raising=False)
+
+    # Nivel 2: Estándar de usuario ~/.a3ref/arma3_wiki.db
+    fake_home = tmp_path / "user_home"
+    (fake_home / ".a3ref").mkdir(parents=True)
+    user_db = fake_home / ".a3ref" / "arma3_wiki.db"
+    user_db.write_bytes(b"SQLite format 3\x00")
+    monkeypatch.setenv("HOME", str(fake_home))
+    monkeypatch.setenv("USERPROFILE", str(fake_home))
+    tier, label, p = get_db_resolution_level()
+    assert tier == 2
+    assert p == user_db
+
+    # Nivel 3: Fallback de contenedor Claude AI
+    monkeypatch.setenv("HOME", str(empty_home))
+    monkeypatch.setenv("USERPROFILE", str(empty_home))
+    claude_db = tmp_path / "claude_cache" / "arma3_wiki.db"
+    claude_db.parent.mkdir(parents=True)
+    claude_db.write_bytes(b"SQLite format 3\x00")
+    monkeypatch.setenv("CLAUDE_A3REF_CACHE", str(claude_db))
+    tier, label, p = get_db_resolution_level()
+    assert tier == 3
+    assert label == "CLAUDE_CONTAINER_DB"
+    assert p == claude_db
+    monkeypatch.delenv("CLAUDE_A3REF_CACHE", raising=False)
+
+    # Nivel 4: Sin réplica SQLite local/contenedor
+    tier, label, p = get_db_resolution_level()
+    assert tier == 4
+    assert label == "SIN_REPLICA"
+    assert p is None
+    clear_caches()
+
+
+def test_18_degraded_mode_sin_replica_wiki_cache(tmp_path: Path, monkeypatch):
+    """18. Modo degradado SIN_REPLICA consulta wiki-cache.md (31 comandos clave) y emite None para no presentes."""
+    clear_caches()
+    # Verifica que la tabla de 31 comandos se carga correctamente
+    wcache = load_wiki_cache_md()
+    assert len(wcache) == 31
+    assert "remoteexec" in wcache
+    assert "publicvariable" in wcache
+    assert "didjip" in wcache
+
+    # Simular entorno aislado sin base de datos ni dataset JSON
+    empty_home = tmp_path / "empty_home"
+    empty_home.mkdir()
+    monkeypatch.setenv("HOME", str(empty_home))
+    monkeypatch.setenv("USERPROFILE", str(empty_home))
+    monkeypatch.delenv("SQF_WIKI_DB_PATH", raising=False)
+    monkeypatch.delenv("SQF_WIKI_DATA_PATH", raising=False)
+    monkeypatch.delenv("A3REF_WIKI_PATH", raising=False)
+
+    import sqf_wiki_reader
+    monkeypatch.setattr(sqf_wiki_reader, "_discover_default_wiki_path", lambda: empty_home)
+    clear_caches()
+
+    assert is_degraded_mode() is True
+
+    # Comando presente en wiki-cache.md (31 comandos)
+    info_re = get_command("remoteExec")
+    assert info_re is not None
+    assert info_re["mode"] == "SIN_REPLICA"
+    assert info_re["canonical_name"] == "remoteExec"
+    assert info_re["arg"] == "AG"
+    assert info_re["effect"] == "EG"
+
+    # Comando oficial pero no presente en wiki-cache.md (debe emitir None honestamente)
+    info_sp = get_command("setPos")
+    assert info_sp is None
+
+    # Comando inventado (debe emitir None limpiamente)
+    info_inv = get_command("comandoTotalmenteInexistente999")
+    assert info_inv is None
+    clear_caches()
+
+
+def test_19_degraded_mode_lookup_syntax_symbol(tmp_path: Path, monkeypatch):
+    """19. lookup_syntax_symbol en modo degradado SIN_REPLICA resuelve comandos de wiki-cache.md."""
+    clear_caches()
+    empty_home = tmp_path / "empty_home"
+    empty_home.mkdir()
+    monkeypatch.setenv("HOME", str(empty_home))
+    monkeypatch.setenv("USERPROFILE", str(empty_home))
+    monkeypatch.delenv("SQF_WIKI_DB_PATH", raising=False)
+    monkeypatch.delenv("SQF_WIKI_DATA_PATH", raising=False)
+    monkeypatch.delenv("A3REF_WIKI_PATH", raising=False)
+
+    import sqf_wiki_reader
+    monkeypatch.setattr(sqf_wiki_reader, "_discover_default_wiki_path", lambda: empty_home)
+    clear_caches()
+
+    res = lookup_syntax_symbol("didJIP")
+    assert res is not None
+    assert res["canonical_name"] == "didJIP"
+    assert res["mode"] == "SIN_REPLICA"
+    assert res["status"] == "ok"
+    assert res["type"] == "command"
+
+    # Símbolo no presente en wiki-cache.md en modo degradado
+    res_none = lookup_syntax_symbol("simboloAusenteEnCache123")
+    assert res_none is None
+    clear_caches()
+
+
+def test_20_cli_synthetic_vs_full(tmp_path: Path):
+    """20. CLI emite salida sintética compacta por defecto y JSON exhaustivo con --full."""
+    import subprocess
+    import sys
+
+    # Salida sintética por defecto
+    proc_synth = subprocess.run(
+        [sys.executable, str(Path(__file__).resolve().parent.parent / "skills" / "arma3-sqf-skill" / "scripts" / "sqf_wiki_reader.py"), "--command", "remoteExec"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert "Comando: remoteExec" in proc_synth.stdout
+    assert "Firma:" in proc_synth.stdout
+    assert "Localidad:" in proc_synth.stdout
+    assert len(proc_synth.stdout.split()) < 100
+
+    # Salida --full (exhaustiva en JSON)
+    proc_full = subprocess.run(
+        [sys.executable, str(Path(__file__).resolve().parent.parent / "skills" / "arma3-sqf-skill" / "scripts" / "sqf_wiki_reader.py"), "--command", "remoteExec", "--full"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    import json
+    data = json.loads(proc_full.stdout)
+    assert data["canonical_name"] == "remoteExec"
+    assert "examples" in data or "syntaxes" in data or "syntax" in data
+

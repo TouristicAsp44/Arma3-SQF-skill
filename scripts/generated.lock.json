@@ -9,8 +9,8 @@
     "integrations/claude/CLAUDE.md#AUTHORED:0": "173187f8fead872e69d90ac041d9cb28b49edfbf514a63dadc0efd7d05968571"
   },
   "generated": {
-    "integrations/chatgpt/custom_gpt_instructions.md": "dc80496046ee9465e61659cf626349e031d9d82b7a3fd34a0783fe3ba33e6eb8",
-    "integrations/gemini/system_instruction.md": "2c2f08d6f63f89aac429fe05cb1c190eab989c3bb36b6860be61037b1e507565",
-    "integrations/claude/claude_desktop_paste.md": "b93d9d01d36dd0531edea7c414cad816bbff736203121365e0f8128c476223d0"
+    "integrations/chatgpt/custom_gpt_instructions.md": "91ec6ce907b7c0e887799877e8e0284dd7385620eb7ea338d27fa9d72f84cdac",
+    "integrations/gemini/system_instruction.md": "c5c14d89d4a9d5e77ea48990202eb60dac432c8a817dcdfe14d2165108e6194c",
+    "integrations/claude/claude_desktop_paste.md": "f288e92346c962045fa3dbb12c8466e8c6ab786c5ee738b1791d1300fa653e0a"
   }
 }

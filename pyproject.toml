@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "arma3-sqf-skill"
-version = "1.0.0"
-description = "Skill universal de análisis y revisión SQF para Arma 3 — compatible con Claude, ChatGPT, Cursor y cualquier host MCP/OpenAPI"
+version = "2.0.0"
+description = "Skill universal de análisis y revisión SQF para Arma 3 — compatible con Claude, ChatGPT, Cursor y OpenAPI"
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.11"
@@ -35,7 +35,6 @@ linter = [
 dev = [
     "pytest>=8.0.0",
     "pytest-cov>=5.0.0",
-    "anyio>=4.0.0",
     "platformdirs>=4.0.0",
     "ruff>=0.4.0",
     "sqflint>=0.3.2",
@@ -70,7 +69,13 @@ extraPaths = [
 ]
 
 [tool.setuptools]
-py-modules = ["sqf_models", "sqf_orchestrator"]
+py-modules = [
+    "sqf_models",
+    "sqf_orchestrator",
+    "sqf_wiki_reader",
+    "wiki_db_builder",
+    "run_sqflint",
+]
 
 [tool.setuptools.package-dir]
 "" = "skills/arma3-sqf-skill/scripts"

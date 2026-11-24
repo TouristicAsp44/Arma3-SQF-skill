@@ -7,10 +7,14 @@ Códigos de salida:
   0: SIN ERRORES (análisis completado sin errores de sintaxis)
   1: ERRORES (se detectaron errores de sintaxis en uno o más archivos)
   2: Error de argumentos o ruta no encontrada
-  3: SQFLINT_NO_DISPONIBLE (el linter no está instalado ni accesible)
+  3: SQFLINT_NO_DISPONIBLE (el linter no está instalado, accesible o target vacío)
 """
+from __future__ import annotations
+
 import glob
+import importlib.util
 import os
+from pathlib import Path
 import re
 import shutil
 import site
@@ -19,26 +23,26 @@ import sys
 
 try:
     import sqf.analyzer as sqf_analyzer
-    from sqf.exceptions import SQFParserError
+    from sqf.exceptions import SQFParserError, SQFWarning
     from sqf.parser import parse as sqf_parse
     HAS_SQF_ENGINE = True
 except ImportError:
     HAS_SQF_ENGINE = False
+    sqf_analyzer = None
+    SQFParserError = None
+    SQFWarning = None
+    sqf_parse = None
 
 
-def locate_sqflint():
+def locate_sqflint() -> list[str] | None:
     """
     Localiza el ejecutable o comando de sqflint en el sistema siguiendo una cascada multiplataforma:
-    1. Invocación como módulo python en el intérprete actual (sys.executable -m sqflint).
-    2. Búsqueda en PATH del sistema (shutil.which).
-    3. Carpetas Scripts / bin del usuario (APPDATA, site.getuserbase(), sys.prefix).
+    1. Búsqueda directa en $PATH (shutil.which).
+    2. Invocación como módulo Python (sys.executable -m sqflint) si sqflint o sqf están disponibles.
+    3. Rutas estándar de usuario (Scripts / bin en APPDATA, LOCALAPPDATA, site.getuserbase(), sys.prefix, ~/.local/bin, etc.).
     Retorna una lista con el comando base o None si no está disponible.
     """
-    # 1. Prioridad: motor sqf disponible en el entorno activo
-    if HAS_SQF_ENGINE:
-        return [sys.executable, "-m", "sqflint"]
-
-    # 2. Búsqueda directa en PATH
+    # 1. Búsqueda directa en PATH
     exe = shutil.which("sqflint")
     if exe:
         return [exe]
@@ -47,8 +51,12 @@ def locate_sqflint():
         if exe:
             return [exe]
 
-    # 3. Búsqueda en rutas de usuario y prefijos del intérprete
-    candidates = []
+    # 2. Invocación como módulo Python en el intérprete activo
+    if HAS_SQF_ENGINE or (importlib.util.find_spec("sqflint") is not None) or (importlib.util.find_spec("sqf") is not None):
+        return [sys.executable, "-m", "sqflint"]
+
+    # 3. Búsqueda en rutas estándar de usuario y prefijos del sistema
+    candidates: list[str] = []
     if sys.platform == "win32":
         appdata = os.environ.get("APPDATA", "")
         if appdata:
@@ -67,6 +75,7 @@ def locate_sqflint():
             pass
         candidates.append(os.path.join(sys.prefix, "Scripts", "sqflint.exe"))
         candidates.append(os.path.join(sys.prefix, "Scripts", "sqflint.EXE"))
+        candidates.append(os.path.expanduser("~/.local/bin/sqflint.exe"))
     else:
         try:
             user_base = site.getuserbase()
@@ -88,7 +97,7 @@ def locate_sqflint():
     return None
 
 
-def parse_error_line(file_path, line):
+def parse_error_line(file_path: str, line: str) -> str:
     """
     Parsea una línea de salida de sqflint con formato [line,col]:error:msg o [line,col]:warning:msg
     y la formatea como archivo:línea: nivel: mensaje.
@@ -96,7 +105,6 @@ def parse_error_line(file_path, line):
     m = re.match(r"^\[(\d+),\s*(\d+)\]:(?:(error|warning):)?(.*)$", line, re.IGNORECASE)
     if m:
         line_num = m.group(1)
-        # col_num ignorado en formato canónico archivo:línea: nivel: mensaje
         level = (m.group(3) or "error").lower()
         msg = m.group(4).strip()
         return f"{file_path}:{line_num}: {level}: {msg}"
@@ -106,7 +114,7 @@ def parse_error_line(file_path, line):
 
 
 def _collect_target_files(target: str) -> list[str]:
-    files = []
+    files: list[str] = []
     if os.path.isdir(target):
         for root, _, filenames in os.walk(target):
             for f in sorted(filenames):
@@ -119,25 +127,28 @@ def _collect_target_files(target: str) -> list[str]:
 
 
 def _lint_single_file(f: str, sqflint_cmd: list[str]) -> tuple[str, list[str], list[str], bool]:
+    output = ""
+    rc = 0
     if HAS_SQF_ENGINE and sqflint_cmd == [sys.executable, "-m", "sqflint"]:
         # Análisis directo en proceso: máxima portabilidad y velocidad multiplataforma
         try:
             with open(f, "r", encoding="utf-8", errors="replace") as sqf_file:
                 code_text = sqf_file.read()
-            lines = []
+            lines: list[str] = []
             has_parser_error = False
             try:
                 res = sqf_parse(code_text)
                 for e in sqf_analyzer.analyze(res).exceptions:
                     pos_line = e.position[0]
                     pos_col = e.position[1] - 1
-                    lines.append(f"[{pos_line},{pos_col}]:{e.message}")
-                    if isinstance(e, SQFParserError):
+                    level = "warning" if (SQFWarning and isinstance(e, SQFWarning)) else "error"
+                    lines.append(f"[{pos_line},{pos_col}]:{level}:{e.message}")
+                    if SQFParserError and isinstance(e, SQFParserError):
                         has_parser_error = True
             except SQFParserError as e:
                 pos_line = e.position[0]
                 pos_col = e.position[1] - 1
-                lines.append(f"[{pos_line},{pos_col}]:{e.message}")
+                lines.append(f"[{pos_line},{pos_col}]:error:{e.message}")
                 has_parser_error = True
             output = "\n".join(lines).strip()
             rc = 1 if has_parser_error else 0
@@ -166,8 +177,8 @@ def _lint_single_file(f: str, sqflint_cmd: list[str]) -> tuple[str, list[str], l
             output = f"Excepción al ejecutar sqflint: {ex}"
             rc = 1
 
-    file_lines = []
-    file_errors = []
+    file_lines: list[str] = []
+    file_errors: list[str] = []
     if output:
         for line in output.splitlines():
             s_line = line.strip()
@@ -224,7 +235,7 @@ def _emit_linter_results(
         sys.exit(1)
 
 
-def main(argv=None):
+def main(argv: list[str] | None = None) -> int:
     if sys.stdout.encoding and sys.stdout.encoding.lower() not in ("utf-8", "utf8"):
         try:
             sys.stdout.reconfigure(encoding="utf-8")
@@ -234,7 +245,7 @@ def main(argv=None):
     args = sys.argv[1:] if argv is None else argv
     if len(args) < 1:
         print("Uso: python run_sqflint.py <archivo.sqf | directorio>")
-        return 1
+        sys.exit(2)
 
     target = args[0]
     if not os.path.exists(target):
@@ -244,17 +255,19 @@ def main(argv=None):
     sqflint_cmd = locate_sqflint()
     if not sqflint_cmd:
         print("SQFLINT_NO_DISPONIBLE (instala con: pip install sqflint, o preinstálalo fuera del sandbox)")
+        print(f"[NO_VERIFICADO] {target}:0 (Sintaxis): Analizador estático no disponible en el host (SQFLINT_NO_DISPONIBLE)")
         sys.exit(3)
 
     files = _collect_target_files(target)
     if not files:
         print(f"ESTADO: NO SE ENCONTRARON ARCHIVOS .sqf EN '{target}'")
+        print(f"[NO_VERIFICADO] {target}:0 (Sintaxis): Directorio vacío o sin archivos .sqf. El análisis no se ejecutó.")
         print("El analisis no se ejecuto. Reportar como NO VERIFICADO, nunca como PASA.")
         sys.exit(3)
 
     total_with_errors = 0
-    detailed_results = []
-    error_lines = []
+    detailed_results: list[tuple[str, str, list[str]]] = []
+    error_lines: list[str] = []
 
     for f in files:
         status_tag, file_lines, file_errors, has_error = _lint_single_file(f, sqflint_cmd)
@@ -264,6 +277,7 @@ def main(argv=None):
         detailed_results.append((f, status_tag, file_lines))
 
     _emit_linter_results(detailed_results, error_lines, len(files), total_with_errors)
+    return 0
 
 
 if __name__ == "__main__":

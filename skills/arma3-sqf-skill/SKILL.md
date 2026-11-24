@@ -1,80 +1,84 @@
 ---
 name: arma3-sqf-skill
 description: >-
-  [ES] Audita y diseña scripts SQF de Arma 3 para servidor dedicado. Activar para:
-  remoteExec, publicVariable, JIP, Headless Client, init.sqf, CfgRemoteExec,
-  bucles sobre allUnits, variables sin private, comandos de interfaz en servidor.
-  No activar para: preguntas conceptuales, typos, código no SQF.
-  [EN] Audits and designs Arma 3 SQF scripts for dedicated server. Activate for:
-  remoteExec, publicVariable, JIP, Headless Client, init.sqf, CfgRemoteExec,
-  loops over allUnits, unscoped variables, interface commands on server paths.
-  Do not activate for: conceptual questions, typos, non-SQF code.
+  Asistencia especializada para analizar, auditar, diseñar, implementar y
+  documentar scripts SQF de Arma 3. Úsala ante consultas sobre SQF, locality,
+  remoteExec, CfgRemoteExec, JIP, publicVariable, init.sqf, servidores
+  dedicados, Headless Client, rendimiento, seguridad multijugador o
+  arquitectura de funciones.
 ---
 
 # Arma 3 SQF Universal Skill — Capa 0
 
-Audita, diseña e implementa scripts SQF para Arma 3 en servidor dedicado (`Arma3Server.exe`), garantizando estabilidad y optimización de contexto.
+## 1. Propósito
 
-## 1. Cuatro Intenciones
+Auditar, diseñar, implementar y documentar SQF de Arma 3 en dedicado (`Arma3Server.exe`), asegurando estabilidad MP y scheduler.
 
-- **AUDITAR**: Revisión contra invariantes de calidad → `references/lenses/`
-- **DISEÑAR**: Plan modular, interfaces y JIP → `references/workflows/modes.md` + `references/lenses/architect.md`
-- **IMPLEMENTAR**: Escribir módulos según estándar → `references/workflows/implementation.md` + `references/lenses/best_practices.md`
-- **DOCUMENTAR**: Guía de uso y pruebas → `references/workflows/documentation.md` (y `test_plan.md`)
+## 2. Activación/Exclusión
 
-## 2. Índice N1 de las 7 Categorías de Bloqueante (P0)
+- **Activar**: SQF, locality, `remoteExec`, `CfgRemoteExec`, JIP, `publicVariable`, `init.sqf`, dedicado, HC, scheduler, `allUnits`, variables sin scope.
+- **Excluir**: Preguntas teóricas, Eden 3D, código no SQF o erratas.
 
-Definición completa en `references/invariants.md`:
-1. Sintaxis SQF y variables no declaradas (sin `private`/`params`).
-2. Softlocks, bucles infinitos y bloqueos de inicialización.
-3. Violaciones de dedicado (`player` o interfaz en servidor).
-4. Suspensión unscheduled (`sleep`/`uiSleep`/`waitUntil` con `canSuspend == false`).
-5. Violaciones de lista blanca en `CfgRemoteExec >> Functions`.
-6. Contratos de interfaz rotos e incompatibilidades en `params`.
+## 3. Modos
+
+- **AUDITAR**: Lentes (`references/lens-*.md`, antes `references/lenses/`) → `references/invariants.md`.
+- **DISEÑAR**: Modular y JIP → `references/workflows/modes.md` + `references/lens-architect.md`.
+- **IMPLEMENTAR**: SQF → `references/workflows/implementation.md` + `references/lens-best-practices.md` (`best_practices.md`).
+- **DOCUMENTAR**: Pruebas → `references/workflows/documentation.md` + `references/workflows/test_plan.md`.
+
+## 4. Triage
+
+`sqf_orchestrator.py --root <raíz> --mode-query`:
+- **Micro**: ≤50 líneas, sin init, red ni scheduler.
+- **Estándar**: 2–3 archivos, >50 líneas, init o red/scheduler.
+- **Completo**: ≥4 archivos o ≥3 módulos, JIP, HC o persistencia.
+- **Fallback**: Sin disco: `Estándar` (`NO VERIFICADO`). Prohibido Micro manual; red escala a `Estándar`.
+
+## 5. Protocolo
+
+1. Perfil: 7 parámetros (`ARMA_VERSION`, `DESTINO`, `CBA`, `ACE3`, `SERVIDOR_DEDICADO`, `SQFLINT`, `MODO`).
+2. Triage: modo e intención.
+3. Análisis: `sqf_orchestrator.py --lint <archivo>` o checklist.
+4. Lentes: `references/lens-locality.md`, `references/lens-performance.md`, `references/lens-best-practices.md`, `references/lens-config.md`, `references/lens-architect.md`, `references/lens-claims.md`, `references/workflows/innovation.md`.
+5. Corrección: máx. 3 iteraciones (Locality > Rendimiento > BP). 6. Puerta: Cero bloqueantes.
+
+## 6. 7 Bloqueantes P0
+
+En `references/invariants.md`:
+1. Sintaxis SQF y variables sin scope (`private`/`params`).
+2. Softlocks, bucles infinitos y bloqueos init.
+3. Violaciones de dedicado (`player` o UI en servidor).
+4. Suspensión unscheduled (`sleep`/`waitUntil` con `!canSuspend`).
+5. Violación de whitelist en `CfgRemoteExec >> Functions`.
+6. Contratos rotos o incompatibilidad en `params`.
 7. Dependencias no permitidas (`CBA`/`ACE3`).
+*Puerta*: ≥1 bloqueante tras 3 iteraciones: DETENER; PROHIBIDO entregar.
 
-## 3. Puerta de Calidad y Honestidad Técnica
+## 7. Seguridad
 
-- **Puerta de Calidad**: Si tras 3 iteraciones queda ≥1 bloqueante: DETENER; PROHIBIDO entregar. Solo CERO bloqueantes.
-- **Principio de Honestidad**: Sin herramientas activas (linter/wiki): reportar `NO VERIFICADO`, jamás `PASA`. Sin prueba en dedicado real no declarar completo.
+- `CfgRemoteExec`: `mode = 1` en `Functions` (whitelist); `mode = 0` en `Commands`.
+- `params` tipados en red. `compileFinal` en globales; aislamiento cliente/servidor.
 
-## 4. Triage de Modo Determinista
+## 8. Estados
 
-Criterios de `references/invariants.md`:
-- Determinación: `sqf_orchestrator.py --root <raíz del proyecto> --mode-query`
-- **Micro**: Archivo único ≤50 líneas, sin ciclo de vida, red ni scheduler.
-- **Estándar**: 2–3 archivos, >50 líneas, ciclo de vida o señales de red/scheduler.
-- **Completo**: ≥4 archivos o ≥3 módulos, JIP, Headless Client, persistencia.
-- **Fallback**: Sin disco, defecto `Estándar` (`NO VERIFICADO`). No clasificar Micro manualmente.
-- **Escalado**: Señal de red o scheduler en Micro escala a `Estándar`.
+- `references/rubrica.md`: `BLOQUEANTE` (P0), `SUGERENCIA`, `NO_VERIFICADO`, `NO_APLICA`.
+- Honestidad: Sin linter ni wiki, reportar `NO VERIFICADO`, jamás `PASA`. Sin servidor real, no declarar verificado.
 
-## 5. Activación de Lentes y Flujos (Bajo Demanda)
+## 9. Formato de Informe P1–P4
 
-Abre la lente o flujo ante su señal disparadora (subagentes equivalentes):
-- `remoteExec` | `publicVariable` | `JIP` | `HC` (`sqf-locality-auditor`) → `references/lenses/locality.md`
-- `allUnits` | `EachFrame` | `scheduler` (`sqf-performance-auditor`) → `references/lenses/performance.md`
-- `scope` | `private` | `params` (`sqf-best-practices-reviewer`) → `references/lenses/best_practices.md`
-- `CfgRemoteExec` | `CfgFunctions` (`sqf-mission-config-auditor`) → `references/lenses/config.md`
-- `arquitectura` | `módulos` | `interfaz` (`sqf-architect`) → `references/lenses/architect.md`
-- `BIKI` | `comandos wiki` (`sqf-claim-verifier`) → `references/lenses/claims.md`
-- `implementar` (`sqf-developer`) → `references/workflows/implementation.md`
-- `documentar` (`sqf-doc-writer`) → `references/workflows/documentation.md`
-- `plan pruebas` (`sqf-test-plan-generator`) → `references/workflows/test_plan.md`
-- `linter` (`sqf-static-analyzer`) → `python scripts/sqf_orchestrator.py --lint <archivo>`
-- `innovar` (`sqf-innovator`) → `references/workflows/innovation.md`
-
-## 6. Operación y Formato del Informe
-
-- **Modo archivo (con filesystem)**: Ejecuta `python scripts/sqf_orchestrator.py --lint <archivo>`.
-- **Modo pegado (sin filesystem)**: Checklist estático de `references/invariants.md` (degrada a `NO VERIFICADO` sin linter ni wiki).
-
-Formato estructurado de `references/report_format.md`:
+Contrato (`references/report_format.md`):
 ```
 REPORT_SCHEMA_VERSION: 1
 [BLOQUEANTE|SUGERENCIA|NO_VERIFICADO] archivo:linea (disciplina): descripcion
 RESUMEN: bloqueantes=N; sugerencias=N; no_verificado=N
 ```
 
-## 7. Perfil del Proyecto (7 parámetros)
+## 10. Índice de Referencias
 
-Declarar al inicio (`ARMA_VERSION`, `DESTINO`, `CBA`, `ACE3`, `SERVIDOR_DEDICADO`, `SQFLINT`, `MODO`). Turnos siguientes refieren perfil declarado. Ver `references/invariants.md`.
+En `references/`: `invariants.md`, `report_format.md`, `rubrica.md`, `sqf-standards.md`, `checklist-entrega.md`, `diferencial-misiones-addons.md`, `wiki-cache.md`, `lens-*.md`, `workflows/`.
+
+## 11. Adaptador de Anfitrión
+
+- Archivo: `sqf_orchestrator.py --lint <archivo>`.
+- Pegado: Checklist de `references/invariants.md` (`NO VERIFICADO`).
+- Host: `agents/openai.yaml`, `integrations/`. Lentes portables.

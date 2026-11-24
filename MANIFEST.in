@@ -10,7 +10,9 @@ include pyproject.toml
 include requirements.txt
 include requirements-dev.txt
 
-recursive-include skills/arma3-sqf-skill *.md *.py *.txt
+recursive-include skills/arma3-sqf-skill *.md *.py *.txt *.yaml *.sh
+include skills/arma3-sqf-skill/agents/openai.yaml
+include skills/arma3-sqf-skill/references/lens-*.md
 recursive-include integrations *.md *.json
 recursive-include scripts *.py *.json
 recursive-include docs *.md
@@ -31,6 +33,10 @@ global-exclude *.db *.sqlite *.db-journal *.db-wal
 global-exclude *.bak *.tmp *.log
 
 exclude skills/arma3-sqf-skill/references/wiki-cache.md
+exclude skills/arma3-sqf-skill/scripts/mcp_server.py
+exclude skills/arma3-sqf-skill/references/run_sqflint.py
+prune skills/arma3-sqf-skill/references/lenses
+exclude tests/test_mcp_server.py
 exclude PLAN-IMPROVEMENTS*.md
 exclude PLAN-PR*.md
 exclude docs/INSTRUCCION-ANTIGRAVITY-PR*.md

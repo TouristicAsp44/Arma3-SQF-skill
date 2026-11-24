@@ -2,7 +2,7 @@
   "$schema": "https://antigravity.google/schemas/v1/plugin.json",
   "name": "arma3-sqf-skill",
   "displayName": "Arma 3 SQF Universal Skill",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Skill standalone de análisis y revisión SQF para Arma 3 — porta las capacidades del plugin arma3-sqf-review a Claude, ChatGPT Custom GPTs, Cursor y cualquier host compatible con MCP o OpenAPI. Sin dependencia de Antigravity.",
   "disabled": false,
   "logo": "assets/logo.png"

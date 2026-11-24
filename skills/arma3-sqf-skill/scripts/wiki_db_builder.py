@@ -8,18 +8,168 @@ Utiliza exclusivamente la biblioteca estándar de Python (>= 3.11).
 
 from __future__ import annotations
 
+import sys
+# Desactivar generación de bytecode para entornos de solo lectura
+sys.dont_write_bytecode = True
+
 import argparse
 import hashlib
 import json
+import os
 import sqlite3
 import subprocess
-import sys
+import tempfile
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 SCHEMA_VERSION = "1.0"
+SKILL_DIR = Path(__file__).resolve().parent.parent
+
+
+def is_writable_dir(directory: Path) -> bool:
+    """Verifica si un directorio tiene permisos efectivos de escritura sin dejar residuos."""
+    try:
+        directory.mkdir(parents=True, exist_ok=True)
+        probe = directory / f".write_probe_{os.getpid()}_{time.time_ns()}.tmp"
+        probe.touch()
+        probe.unlink()
+        return True
+    except (OSError, PermissionError):
+        return False
+
+
+def get_container_cache_dir() -> Path:
+    """Retorna la ruta de caché en contenedor si está disponible vía entorno o convención."""
+    env_dir = os.environ.get("A3REF_CACHE_DIR")
+    if env_dir:
+        return Path(env_dir)
+    return Path(os.sep.join(["", "home", "claude", "a3ref_cache"]))
+
+
+def resolve_output_db(
+    out: Path | str | None = None,
+    db_path: Path | str | None = None,
+    output_dir: Path | str | None = None,
+) -> Path:
+    """Resuelve la ruta absoluta del fichero SQLite de salida.
+
+    Prioridad:
+    1. db_path o out explícito.
+    2. output_dir explícito (se compila como <output_dir>/arma3_wiki.db).
+    3. Variable de entorno SQF_WIKI_DB_PATH.
+    4. Directorio de caché en contenedor (arma3_wiki.db si existe y es escribible).
+    5. Directorio de usuario (~/.a3ref/arma3_wiki.db si es escribible o creable).
+    6. Directorio temporal del sistema ($TEMP/arma3_wiki.db).
+    7. Directorio actual de trabajo (./arma3_wiki.db) si es escribible y no está en la carpeta de la skill.
+    """
+    if db_path is not None:
+        return Path(os.path.expandvars(os.path.expanduser(str(db_path)))).resolve()
+    if out is not None:
+        return Path(os.path.expandvars(os.path.expanduser(str(out)))).resolve()
+    if output_dir is not None:
+        out_d = Path(os.path.expandvars(os.path.expanduser(str(output_dir)))).resolve()
+        return out_d / "arma3_wiki.db"
+
+    env_path = os.environ.get("SQF_WIKI_DB_PATH")
+    if env_path:
+        return Path(os.path.expandvars(os.path.expanduser(env_path))).resolve()
+
+    container_cache = get_container_cache_dir()
+    if container_cache.is_dir() and is_writable_dir(container_cache):
+        return (container_cache / "arma3_wiki.db").resolve()
+
+    user_cache = Path.home() / ".a3ref"
+    try:
+        user_cache.mkdir(parents=True, exist_ok=True)
+        if is_writable_dir(user_cache):
+            return (user_cache / "arma3_wiki.db").resolve()
+    except (OSError, PermissionError):
+        pass
+
+    temp_dir = Path(tempfile.gettempdir())
+    if is_writable_dir(temp_dir):
+        return (temp_dir / "arma3_wiki.db").resolve()
+
+    cwd = Path.cwd()
+    if is_writable_dir(cwd):
+        try:
+            cwd.resolve().relative_to(SKILL_DIR.resolve())
+            # Está dentro de la skill, evitar escribir allí por defecto
+        except ValueError:
+            return (cwd / "arma3_wiki.db").resolve()
+
+    return (temp_dir / "arma3_wiki.db").resolve()
+
+
+def resolve_data_dir(data_dir: Path | str | None = None) -> Path:
+    """Resuelve la ruta del directorio de datos JSON de a3ref."""
+    if data_dir is not None:
+        p = Path(os.path.expandvars(os.path.expanduser(str(data_dir)))).resolve()
+        if p.is_dir():
+            return p
+        raise FileNotFoundError(f"Directorio de datos no encontrado: {p}")
+
+    env_data = os.environ.get("A3REF_DATA_DIR") or os.environ.get("SQF_WIKI_DATA_DIR")
+    if env_data:
+        p = Path(os.path.expandvars(os.path.expanduser(env_data))).resolve()
+        if p.is_dir() and (p / "commands.json").is_file():
+            return p
+
+    container_cache = get_container_cache_dir()
+    candidates = [
+        container_cache / "a3ref",
+        container_cache,
+        Path.home() / ".a3ref" / "a3ref",
+        Path.home() / ".a3ref",
+        Path.cwd() / "a3ref",
+        Path.cwd(),
+    ]
+    for c in candidates:
+        if c.is_dir() and (c / "commands.json").is_file():
+            return c.resolve()
+
+    raise FileNotFoundError(
+        "Directorio de datos JSON de a3ref no especificado y no encontrado en rutas por defecto. "
+        "Especifique la ruta con --data /ruta/a/a3ref"
+    )
+
+
+def resolve_existing_db(db_path: Path | str | None = None) -> Path | None:
+    """Busca una base de datos existente en las rutas estándar si no se proporciona una."""
+    if db_path is not None:
+        p = Path(os.path.expandvars(os.path.expanduser(str(db_path)))).resolve()
+        return p if p.is_file() else None
+
+    # Nivel 1: SQF_WIKI_DB_PATH
+    env_path = os.environ.get("SQF_WIKI_DB_PATH")
+    if env_path:
+        p = Path(os.path.expandvars(os.path.expanduser(env_path))).resolve()
+        if p.is_file():
+            return p
+
+    # Nivel 2: Local ./arma3_wiki.db y ~/.a3ref/arma3_wiki.db
+    p_local = Path.cwd() / "arma3_wiki.db"
+    if p_local.is_file():
+        return p_local.resolve()
+
+    p_user = Path.home() / ".a3ref" / "arma3_wiki.db"
+    if p_user.is_file():
+        return p_user.resolve()
+
+    # Nivel 3: Fallback en caché de contenedor
+    container_cache = get_container_cache_dir()
+    p_container = container_cache / "arma3_wiki.db"
+    if p_container.is_file():
+        return p_container.resolve()
+
+    # Nivel 4: Temp dir
+    p_temp = Path(tempfile.gettempdir()) / "arma3_wiki.db"
+    if p_temp.is_file():
+        return p_temp.resolve()
+
+    return None
 
 
 def check_fts5_supported(conn: sqlite3.Connection) -> bool:
@@ -199,18 +349,37 @@ def init_schema(conn: sqlite3.Connection, enable_fts: bool = True) -> bool:
     return fts_active
 
 
-def build_db(data_dir: Path, out_db: Path, enable_fts: bool = True) -> dict[str, Any]:
+def build_db(data_dir: Path | str, out_db: Path | str, enable_fts: bool = True) -> dict[str, Any]:
     """Construye la base de datos SQLite de forma determinista y ordenada."""
+    data_dir = Path(os.path.expandvars(os.path.expanduser(str(data_dir)))).resolve()
+    out_db = Path(os.path.expandvars(os.path.expanduser(str(out_db)))).resolve()
+
     if not data_dir.is_dir():
         raise FileNotFoundError(f"Directorio de datos no encontrado: {data_dir}")
 
-    out_db.parent.mkdir(parents=True, exist_ok=True)
+    parent_dir = out_db.parent
+    if not is_writable_dir(parent_dir):
+        raise PermissionError(
+            f"El directorio destino '{parent_dir}' es de solo lectura o carece de permisos de escritura. "
+            f"Especifique un directorio escribible con --output-dir o --db-path (ej. --output-dir $CACHE_DIR o $TEMP)."
+        )
+
     if out_db.exists():
-        out_db.unlink()
+        if not os.access(out_db, os.W_OK):
+            raise PermissionError(
+                f"El archivo '{out_db}' ya existe pero es de solo lectura y no se puede sobrescribir."
+            )
+        try:
+            out_db.unlink()
+        except (PermissionError, OSError) as e:
+            raise PermissionError(
+                f"No se pudo eliminar el archivo existente '{out_db}': {e}"
+            ) from e
 
     conn = sqlite3.connect(str(out_db))
     conn.execute("PRAGMA journal_mode = OFF;")
     conn.execute("PRAGMA synchronous = OFF;")
+    conn.execute("PRAGMA temp_store = MEMORY;")
     conn.execute("PRAGMA encoding = 'UTF-8';")
 
     fts_active = init_schema(conn, enable_fts=enable_fts)
@@ -761,52 +930,139 @@ def verify_db_parity(db_path: Path, data_dir: Path) -> tuple[bool, list[str]]:
     return len(errors) == 0, errors
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description="Constructor determinista de la base de datos BIKI SQLite")
-    subparsers = parser.add_subparsers(dest="subcommand", required=True)
+def create_parser() -> argparse.ArgumentParser:
+    """Configura el parser de argumentos de línea de comandos."""
+    parser = argparse.ArgumentParser(
+        description="Constructor determinista de la base de datos BIKI SQLite"
+    )
+    subparsers = parser.add_subparsers(dest="subcommand", required=False)
 
     # Subcomando: build
     p_build = subparsers.add_parser("build", help="Construir base de datos SQLite")
-    p_build.add_argument("--data", type=Path, required=True, help="Directorio con archivos JSON de a3ref")
-    p_build.add_argument("--out", type=Path, required=True, help="Ruta del fichero .db de salida")
-    p_build.add_argument("--no-fts", action="store_true", help="Desactivar índice de texto completo FTS5")
-    p_build.add_argument("--jobs", type=int, default=1, help="Número de jobs (respetado como estándar)")
+    p_build.add_argument(
+        "--data", "--data-dir", dest="data", type=Path, default=None,
+        help="Directorio con archivos JSON de a3ref"
+    )
+    p_build.add_argument(
+        "--out", type=Path, default=None,
+        help="Ruta del fichero .db de salida"
+    )
+    p_build.add_argument(
+        "--db-path", type=Path, default=None,
+        help="Ruta del fichero .db de salida (alias de --out)"
+    )
+    p_build.add_argument(
+        "--output-dir", "-o", type=Path, default=None,
+        help="Directorio destino escribible donde compilar arma3_wiki.db"
+    )
+    p_build.add_argument(
+        "--no-fts", action="store_true",
+        help="Desactivar índice de texto completo FTS5"
+    )
+    p_build.add_argument(
+        "--quiet", "-q", action="store_true",
+        help="Modo silencioso / desatendido para bootstrap (sin salida a stdout)"
+    )
+    p_build.add_argument(
+        "--jobs", type=int, default=1,
+        help="Número de jobs (respetado como estándar)"
+    )
 
     # Subcomando: stats
     p_stats = subparsers.add_parser("stats", help="Mostrar estadísticas de la base de datos")
-    p_stats.add_argument("--db", type=Path, required=True, help="Ruta del fichero .db")
+    p_stats.add_argument("--db", type=Path, default=None, help="Ruta del fichero .db")
 
     # Subcomando: verify
     p_verify = subparsers.add_parser("verify", help="Verificar paridad DB vs JSON")
-    p_verify.add_argument("--db", type=Path, required=True, help="Ruta del fichero .db")
-    p_verify.add_argument("--data", type=Path, required=True, help="Directorio con archivos JSON de a3ref")
+    p_verify.add_argument("--db", type=Path, default=None, help="Ruta del fichero .db")
+    p_verify.add_argument(
+        "--data", "--data-dir", dest="data", type=Path, default=None,
+        help="Directorio con archivos JSON de a3ref"
+    )
 
     # Subcomando: query
     p_query = subparsers.add_parser("query", help="Consultar información en la base de datos")
-    p_query.add_argument("--db", type=Path, required=True, help="Ruta del fichero .db")
+    p_query.add_argument("--db", type=Path, default=None, help="Ruta del fichero .db")
     p_query.add_argument("--command", type=str, default=None, help="Nombre de comando a consultar")
     p_query.add_argument("--function", type=str, default=None, help="Nombre de función a consultar")
     p_query.add_argument("--topic", type=str, default=None, help="Título de tópico a consultar")
     p_query.add_argument("--search", type=str, default=None, help="Texto a buscar (FTS o LIKE)")
 
-    args = parser.parse_args()
+    return parser
 
-    if args.subcommand == "build":
-        t0 = time.perf_counter()
-        res = build_db(args.data, args.out, enable_fts=not args.no_fts)
-        elapsed = round(time.perf_counter() - t0, 3)
-        res["build_time_seconds"] = elapsed
-        print(f"Base de datos generada exitosamente en {args.out} ({elapsed}s)")
-        print(json.dumps(res, indent=2, ensure_ascii=False))
+
+def main(argv: list[str] | None = None) -> int:
+    """Punto de entrada CLI para wiki_db_builder."""
+    if argv is None:
+        argv = sys.argv[1:]
+
+    # Normalizar argumentos: si no empieza por un subcomando conocido o ayuda, asumir 'build' por defecto
+    known_commands = {"build", "stats", "verify", "query"}
+    if not argv or (argv[0] not in known_commands and not argv[0].startswith(("-h", "--h"))):
+        argv = ["build"] + list(argv)
+
+    parser = create_parser()
+    args = parser.parse_args(argv)
+
+    subcommand = args.subcommand or "build"
+
+    if subcommand == "build":
+        try:
+            out_db = resolve_output_db(
+                out=getattr(args, "out", None),
+                db_path=getattr(args, "db_path", None),
+                output_dir=getattr(args, "output_dir", None),
+            )
+            data_dir = resolve_data_dir(getattr(args, "data", None))
+        except (FileNotFoundError, PermissionError) as e:
+            print(f"ERROR: {e}", file=sys.stderr)
+            return 1
+
+        is_quiet = getattr(args, "quiet", False)
+        no_fts = getattr(args, "no_fts", False)
+
+        try:
+            t0 = time.perf_counter()
+            res = build_db(data_dir, out_db, enable_fts=not no_fts)
+            elapsed = round(time.perf_counter() - t0, 3)
+            res["build_time_seconds"] = elapsed
+        except (PermissionError, FileNotFoundError, OSError) as e:
+            print(f"ERROR: {e}", file=sys.stderr)
+            return 1
+        except Exception as e:
+            print(f"ERROR al compilar base de datos: {e}", file=sys.stderr)
+            return 1
+
+        if not is_quiet:
+            print(f"Base de datos generada exitosamente en {out_db} ({elapsed}s)")
+            print(json.dumps(res, indent=2, ensure_ascii=False))
         return 0
 
-    elif args.subcommand == "stats":
-        stats = get_db_stats(args.db)
-        print(json.dumps(stats, indent=2, ensure_ascii=False))
-        return 0
+    elif subcommand == "stats":
+        db_path = resolve_existing_db(getattr(args, "db", None))
+        if not db_path:
+            print("ERROR: Base de datos no encontrada. Especifique --db <ruta>", file=sys.stderr)
+            return 1
+        try:
+            stats = get_db_stats(db_path)
+            print(json.dumps(stats, indent=2, ensure_ascii=False))
+            return 0
+        except Exception as e:
+            print(f"ERROR al obtener estadísticas: {e}", file=sys.stderr)
+            return 1
 
-    elif args.subcommand == "verify":
-        ok, errs = verify_db_parity(args.db, args.data)
+    elif subcommand == "verify":
+        db_path = resolve_existing_db(getattr(args, "db", None))
+        if not db_path:
+            print("ERROR: Base de datos no encontrada. Especifique --db <ruta>", file=sys.stderr)
+            return 1
+        try:
+            data_dir = resolve_data_dir(getattr(args, "data", None))
+        except FileNotFoundError as e:
+            print(f"ERROR: {e}", file=sys.stderr)
+            return 1
+
+        ok, errs = verify_db_parity(db_path, data_dir)
         if ok:
             print("VERIFICACIÓN EXITOSA: Paridad completa DB <-> JSON confirmada.")
             return 0
@@ -816,8 +1072,18 @@ def main() -> int:
                 print(f"  - {e}", file=sys.stderr)
             return 1
 
-    elif args.subcommand == "query":
-        res = query_db(args.db, command=args.command, function=args.function, topic=args.topic, search=args.search)
+    elif subcommand == "query":
+        db_path = resolve_existing_db(getattr(args, "db", None))
+        if not db_path:
+            print("ERROR: Base de datos no encontrada. Especifique --db <ruta>", file=sys.stderr)
+            return 1
+        res = query_db(
+            db_path,
+            command=args.command,
+            function=args.function,
+            topic=args.topic,
+            search=args.search,
+        )
         if res is not None:
             print(json.dumps(res, indent=2, ensure_ascii=False))
             return 0
