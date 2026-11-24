@@ -101,7 +101,7 @@ def test_portable_lenses_and_workflows_referenced_in_skill_md():
     table = parse_paridad_agents_table()
 
     for ag, entry in table.items():
-        paths = re.findall(r"references/(?:lenses|workflows)/[\w-]+\.md", entry["artifact"])
+        paths = re.findall(r"references/(?:lens-[\w-]+|workflows/[\w-]+)\.md", entry["artifact"])
         for p in paths:
             basename = Path(p).name
             assert basename in skill_text, f"El artefacto portable '{p}' (agente '{ag}') no está referenciado en SKILL.md"

@@ -1,7 +1,6 @@
 # Dependencias de desarrollo, pruebas unitarias y linting
 pytest>=8.0.0
 pytest-cov>=5.0.0
-anyio>=4.0.0
 platformdirs>=4.0.0
 ruff>=0.4.0
 sqflint>=0.3.2

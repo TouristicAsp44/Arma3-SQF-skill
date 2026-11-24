@@ -162,20 +162,37 @@ def test_skill_md_invokes_the_orchestrator():
     assert "--lint" in content
 
 
-def test_all_agents_registered_in_skill_md():
-    """Todos los subagentes sqf-*.md de agents/ están registrados en SKILL.md, incluido sqf-claim-verifier."""
+def test_lenses_and_scripts_registered_in_skill_md():
+    """Valida la presencia y registro de los 6 lentes planos references/lens-*.md, run_sqflint.py y openai.yaml."""
     plugin_root = Path(__file__).resolve().parent.parent
-    agents_dir = plugin_root / "agents"
-    skill_file = plugin_root / "skills" / "arma3-sqf-skill" / "SKILL.md"
+    skill_root = plugin_root / "skills" / "arma3-sqf-skill"
+    skill_file = skill_root / "SKILL.md"
+    assert skill_file.is_file(), f"No se encontró SKILL.md en {skill_file}"
+    content = skill_file.read_text(encoding="utf-8")
 
-    skill_content = skill_file.read_text(encoding="utf-8")
-    agent_files = list(agents_dir.glob("sqf-*.md"))
+    # 1. Registro de los 6 lentes planos en SKILL.md y presencia en disco
+    expected_lenses = [
+        "lens-architect.md",
+        "lens-best-practices.md",
+        "lens-claims.md",
+        "lens-config.md",
+        "lens-locality.md",
+        "lens-performance.md",
+    ]
+    ref_dir = skill_root / "references"
+    for lens in expected_lenses:
+        assert (ref_dir / lens).is_file(), f"Falta el lente plano {lens} en {ref_dir}"
+        assert lens in content, f"El lente plano {lens} no está referenciado en {skill_file}"
 
-    assert len(agent_files) == 11, f"Se esperaban 11 agentes en {agents_dir}, pero se encontraron {len(agent_files)}"
+    # 2. Ausencia de la ruta antigua references/lenses/
+    assert not (ref_dir / "lenses").exists(), "La antigua ruta references/lenses/ no debe existir"
 
-    for af in agent_files:
-        agent_name = af.stem  # e.g. "sqf-claim-verifier"
-        assert f"`{agent_name}`" in skill_content or agent_name in skill_content, (
-            f"El subagente {agent_name} no está registrado en {skill_file}"
-        )
+    # 3. Ubicación de run_sqflint.py en scripts/ y ausencia en references/
+    assert (skill_root / "scripts" / "run_sqflint.py").is_file(), "run_sqflint.py debe estar en scripts/"
+    assert not (ref_dir / "run_sqflint.py").exists(), "run_sqflint.py no debe estar en references/"
+
+    # 4. Presencia de openai.yaml en agents/ y registro en SKILL.md
+    openai_yaml = skill_root / "agents" / "openai.yaml"
+    assert openai_yaml.is_file(), f"Falta {openai_yaml}"
+    assert "openai.yaml" in content, f"openai.yaml no está referenciado en {skill_file}"
 

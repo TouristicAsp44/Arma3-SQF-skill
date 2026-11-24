@@ -4,7 +4,7 @@
       "command": "python",
       "args": [
         "skills/arma3-sqf-skill/scripts/sqf_orchestrator.py",
-        "--serve-mcp"
+        "--lint"
       ],
       "cwd": "RUTA_A_TU_PROYECTO",
       "env": {
@@ -16,7 +16,7 @@
       "command": "python3",
       "args": [
         "skills/arma3-sqf-skill/scripts/sqf_orchestrator.py",
-        "--serve-mcp"
+        "--lint"
       ],
       "cwd": "RUTA_A_TU_PROYECTO",
       "env": {

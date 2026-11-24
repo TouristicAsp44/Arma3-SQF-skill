@@ -24,7 +24,11 @@ from wiki_db_builder import (
     build_db,
     compute_db_content_digest,
     get_db_stats,
+    is_writable_dir,
+    main,
     query_db,
+    resolve_data_dir,
+    resolve_output_db,
     verify_db_parity,
 )
 
@@ -210,3 +214,57 @@ def test_provenance_metadata_preserved_in_db(mini_db: Path) -> None:
     assert len(d_sha) == 64
     d_updated = get_dataset_updated_timestamp(db_path=mini_db)
     assert d_updated != "NO_VERIFICADO"
+
+
+def test_cli_output_dir_flag(tmp_path: Path) -> None:
+    """Verifica que el parámetro --output-dir compila arma3_wiki.db en el directorio indicado."""
+    out_dir = tmp_path / "custom_out"
+    code = main(["build", "--data", str(FIXTURES_DIR), "--output-dir", str(out_dir)])
+    assert code == 0
+    expected_db = out_dir / "arma3_wiki.db"
+    assert expected_db.is_file()
+    stats = get_db_stats(expected_db)
+    assert stats["actual_counts"]["commands"] == 3
+
+
+def test_cli_db_path_flag(tmp_path: Path) -> None:
+    """Verifica que el parámetro --db-path permite una ruta exacta arbitraria."""
+    custom_db = tmp_path / "arbitrary" / "custom_name.sqlite3"
+    code = main(["build", "--data", str(FIXTURES_DIR), "--db-path", str(custom_db)])
+    assert code == 0
+    assert custom_db.is_file()
+    stats = get_db_stats(custom_db)
+    assert stats["actual_counts"]["commands"] == 3
+
+
+def test_cli_quiet_flag(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """Verifica que el parámetro --quiet (-q) suprime cualquier salida por stdout."""
+    out_dir = tmp_path / "quiet_out"
+    code = main(["build", "--data", str(FIXTURES_DIR), "--output-dir", str(out_dir), "--quiet"])
+    assert code == 0
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert (out_dir / "arma3_wiki.db").is_file()
+
+
+def test_cli_default_build_subcommand(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """Verifica la invocación sin subcomando explícito 'build' (bootstrap desatendido)."""
+    out_dir = tmp_path / "default_subcommand"
+    code = main(["--data", str(FIXTURES_DIR), "--output-dir", str(out_dir), "-q"])
+    assert code == 0
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert (out_dir / "arma3_wiki.db").is_file()
+
+
+def test_build_db_readonly_target_fails(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Verifica que intentar compilar en un directorio de solo lectura falla limpiamente con PermissionError."""
+    ro_dir = tmp_path / "readonly_dir"
+    ro_dir.mkdir()
+    target_db = ro_dir / "arma3_wiki.db"
+
+    # Simular directorio de solo lectura en is_writable_dir
+    monkeypatch.setattr("wiki_db_builder.is_writable_dir", lambda d: False)
+
+    with pytest.raises(PermissionError, match="solo lectura"):
+        build_db(FIXTURES_DIR, target_db)

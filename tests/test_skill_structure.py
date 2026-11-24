@@ -19,7 +19,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 SKILL_FILE = REPO_ROOT / "skills" / "arma3-sqf-skill" / "SKILL.md"
 
 INTENTS = {
-    "AUDITAR": "references/lenses/",
+    "AUDITAR": "references/lens-",
     "DISEÑAR": "references/workflows/modes.md",
     "IMPLEMENTAR": "references/workflows/implementation.md",
     "DOCUMENTAR": "references/workflows/documentation.md",
@@ -84,3 +84,29 @@ def test_skill_tokens_within_budget() -> None:
     from scripts.measure_tokens import main as measure_main
 
     assert measure_main() == 0, "Presupuesto de tokens superado"
+
+
+@requires_layered_skill
+def test_skill_references_flat_lenses_and_openai() -> None:
+    """Valida que la skill apunta a los lentes planos lens-*.md y openai.yaml."""
+    text = _skill_text()
+    assert "references/lens-" in text or "lens-*.md" in text
+    assert "openai.yaml" in text
+
+    references_dir = REPO_ROOT / "skills" / "arma3-sqf-skill" / "references"
+    for lens_name in (
+        "lens-architect.md",
+        "lens-best-practices.md",
+        "lens-claims.md",
+        "lens-config.md",
+        "lens-locality.md",
+        "lens-performance.md",
+    ):
+        assert (references_dir / lens_name).is_file(), f"Falta el lente plano {lens_name}"
+    assert not (references_dir / "lenses").exists(), "references/lenses/ no debe existir"
+
+    scripts_dir = REPO_ROOT / "skills" / "arma3-sqf-skill" / "scripts"
+    assert (scripts_dir / "run_sqflint.py").is_file(), "run_sqflint.py debe ubicarse en scripts/"
+    assert not (references_dir / "run_sqflint.py").exists(), "run_sqflint.py no debe estar en references/"
+    assert (REPO_ROOT / "skills" / "arma3-sqf-skill" / "agents" / "openai.yaml").is_file()
+
