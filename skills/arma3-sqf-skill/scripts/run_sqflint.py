@@ -36,12 +36,16 @@ except ImportError:
 def locate_sqflint() -> list[str] | None:
     """
     Localiza el ejecutable o comando de sqflint en el sistema siguiendo una cascada multiplataforma:
-    1. Búsqueda directa en $PATH (shutil.which).
-    2. Invocación como módulo Python (sys.executable -m sqflint) si sqflint o sqf están disponibles.
+    1. Invocación en el intérprete activo (sys.executable -m sqflint) si sqflint o sqf están disponibles.
+    2. Búsqueda directa en $PATH (shutil.which).
     3. Rutas estándar de usuario (Scripts / bin en APPDATA, LOCALAPPDATA, site.getuserbase(), sys.prefix, ~/.local/bin, etc.).
     Retorna una lista con el comando base o None si no está disponible.
     """
-    # 1. Búsqueda directa en PATH
+    # 1. Invocación como módulo Python en el intérprete activo (máxima portabilidad multiplataforma)
+    if HAS_SQF_ENGINE or (importlib.util.find_spec("sqflint") is not None) or (importlib.util.find_spec("sqf") is not None):
+        return [sys.executable, "-m", "sqflint"]
+
+    # 2. Búsqueda directa en PATH
     exe = shutil.which("sqflint")
     if exe:
         return [exe]
@@ -49,10 +53,6 @@ def locate_sqflint() -> list[str] | None:
         exe = shutil.which("sqflint.exe")
         if exe:
             return [exe]
-
-    # 2. Invocación como módulo Python en el intérprete activo
-    if HAS_SQF_ENGINE or (importlib.util.find_spec("sqflint") is not None) or (importlib.util.find_spec("sqf") is not None):
-        return [sys.executable, "-m", "sqflint"]
 
     # 3. Búsqueda en rutas estándar de usuario y prefijos del sistema
     candidates: list[str] = []
@@ -128,7 +128,7 @@ def _collect_target_files(target: str) -> list[str]:
 def _lint_single_file(f: str, sqflint_cmd: list[str]) -> tuple[str, list[str], list[str], bool]:
     output = ""
     rc = 0
-    if HAS_SQF_ENGINE and sqflint_cmd == [sys.executable, "-m", "sqflint"]:
+    if HAS_SQF_ENGINE and (sqflint_cmd == [sys.executable, "-m", "sqflint"] or not sqflint_cmd):
         # Análisis directo en proceso: máxima portabilidad y velocidad multiplataforma
         try:
             with open(f, "r", encoding="utf-8", errors="replace") as sqf_file:
@@ -158,6 +158,10 @@ def _lint_single_file(f: str, sqflint_cmd: list[str]) -> tuple[str, list[str], l
         cmd = sqflint_cmd + ["-e", "e", f]
         sub_env = os.environ.copy()
         sub_env["PYTHONUTF8"] = "1"
+        site_paths = [p for p in sys.path if os.path.isdir(p)]
+        if site_paths:
+            existing_pp = sub_env.get("PYTHONPATH", "")
+            sub_env["PYTHONPATH"] = os.pathsep.join(site_paths + ([existing_pp] if existing_pp else []))
         try:
             res = subprocess.run(
                 cmd,
