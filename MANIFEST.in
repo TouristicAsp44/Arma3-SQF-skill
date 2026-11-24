@@ -32,7 +32,6 @@ global-exclude *.py[cod]
 global-exclude *.db *.sqlite *.db-journal *.db-wal
 global-exclude *.bak *.tmp *.log
 
-exclude skills/arma3-sqf-skill/references/wiki-cache.md
 exclude skills/arma3-sqf-skill/scripts/mcp_server.py
 exclude skills/arma3-sqf-skill/references/run_sqflint.py
 prune skills/arma3-sqf-skill/references/lenses

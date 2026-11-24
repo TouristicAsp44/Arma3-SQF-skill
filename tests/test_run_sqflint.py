@@ -3,7 +3,8 @@ import sys
 from pathlib import Path
 
 import pytest
-from run_sqflint import locate_sqflint, main as run_sqflint_main, parse_error_line
+from run_sqflint import locate_sqflint, parse_error_line
+from run_sqflint import main as run_sqflint_main
 
 
 def test_empty_dir_exits_3(tmp_path: Path):

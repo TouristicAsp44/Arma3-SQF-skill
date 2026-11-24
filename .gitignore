@@ -61,9 +61,6 @@ desktop.ini
 *.log
 *.rpt
 
-# Caches locales (PR-6-PREP C.2)
-skills/arma3-sqf-skill/references/wiki-cache.md
-
 # Trazas crudas de evaluación (PR-1 1.n-bis): pueden contener código del
 # usuario. Lo que se versiona es docs/QUALITY.md (agregado).
 evals/runs/

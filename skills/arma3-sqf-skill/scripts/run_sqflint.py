@@ -14,7 +14,6 @@ from __future__ import annotations
 import glob
 import importlib.util
 import os
-from pathlib import Path
 import re
 import shutil
 import site

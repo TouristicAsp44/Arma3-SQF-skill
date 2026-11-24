@@ -9,6 +9,7 @@ Utiliza exclusivamente la biblioteca estándar de Python (>= 3.11).
 from __future__ import annotations
 
 import sys
+
 # Desactivar generación de bytecode para entornos de solo lectura
 sys.dont_write_bytecode = True
 

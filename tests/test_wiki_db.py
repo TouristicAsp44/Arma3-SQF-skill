@@ -24,11 +24,8 @@ from wiki_db_builder import (
     build_db,
     compute_db_content_digest,
     get_db_stats,
-    is_writable_dir,
     main,
     query_db,
-    resolve_data_dir,
-    resolve_output_db,
     verify_db_parity,
 )
 

@@ -28,11 +28,9 @@ from sqf_wiki_reader import (
     format_synthetic,
     get_command,
     get_db_resolution_level,
-    get_function,
     is_degraded_mode,
     load_wiki_cache_md,
     lookup_syntax_symbol,
-    resolve_wiki_db,
 )
 
 try:
