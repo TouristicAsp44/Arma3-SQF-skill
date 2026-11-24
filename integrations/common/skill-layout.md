@@ -12,7 +12,7 @@ skills/arma3-sqf-skill/
 ```
 Ejemplos de referencias válidas:
 - `references/invariants.md`
-- `references/lenses/locality.md`
+- `references/lens-locality.md`
 - `scripts/sqf_orchestrator.py`
 - `references/report_format.md`
 
@@ -26,7 +26,9 @@ Esta convención garantiza portabilidad universal sin suposiciones sobre directo
 arma3-sqf-skill/
 ├── skills/
 │   └── arma3-sqf-skill/
-│       ├── SKILL.md                          <- Entrada unificada (Capa 0)
+│       ├── SKILL.md                          <- Entrada unificada (Capa 0: 1.091 tokens)
+│       ├── agents/
+│       │   └── openai.yaml                   <- Manifiesto OpenAI Custom GPTs / Assistants
 │       ├── references/
 │       │   ├── invariants.md                 <- Fuente canónica de reglas e invariantes
 │       │   ├── sqf-standards.md              <- Estándar de codificación SQF
@@ -34,13 +36,15 @@ arma3-sqf-skill/
 │       │   ├── report_format.md              <- Contrato de esquema v1 del informe
 │       │   ├── checklist-entrega.md          <- Checklist de cierre y entrega
 │       │   ├── diferencial-misiones-addons.md<- Contexto misiones vs addons
-│       │   ├── wiki-cache.md                 <- Resumen local de sintaxis BIKI
-│       │   ├── lenses/                       <- 6 Lentes de disciplina
+│       │   ├── wiki-cache.md                 <- Tabla offline de 31 comandos canónicos
+│       │   ├── lens-*.md                     <- 6 Lentes planas a 1 solo salto
 │       │   └── workflows/                    <- 5 Flujos de trabajo
 │       └── scripts/
-│           ├── sqf_orchestrator.py           <- Motor de orquestación y linter
-│           ├── sqf_wiki_reader.py            <- Lector de documentación oficial
-│           ├── wiki_db_builder.py            <- Generador de base FTS5 SQLite
+│           ├── bootstrap.sh                  <- Configuración desatendida para Claude AI
+│           ├── run_sqflint.py                <- Wrapper multiplataforma de compilador
+│           ├── sqf_orchestrator.py           <- Motor determinista y linter CLI
+│           ├── sqf_wiki_reader.py            <- Lector con resolución de 4 niveles
+│           ├── wiki_db_builder.py            <- Generador FTS5 SQLite
 │           └── sqf_models.py                 <- Modelos de datos del informe
 ├── integrations/
 │   ├── claude/                               <- Adaptador Claude Code y Desktop
@@ -50,14 +54,19 @@ arma3-sqf-skill/
 │   ├── gemini/                               <- Adaptador Google Gemini / AI Studio
 │   └── common/                               <- Esquema y convenciones compartidas
 ├── scripts/
+│   ├── package_skill.py                      <- Empaquetador oficial del ZIP distribuible
 │   ├── check.py                              <- Release gate local por fases
 │   ├── generate_inline_packages.py           <- Generador de paquetes P1–P4
 │   └── measure_tokens.py                     <- Verificador de presupuesto de tokens
 ├── docs/
 │   ├── COMPATIBILIDAD.md                     <- Matriz de compatibilidad y degradación
 │   ├── PARIDAD.md                            <- Matriz de paridad de migración
+│   ├── PRIVACIDAD.md                         <- Postura de confinamiento y seguridad
 │   └── QUALITY.md                            <- Evidencia y métricas de calidad
-└── tests/                                    <- Suite de pruebas deterministas
+├── COMPATIBILITY-REPORT.md                   <- Matriz formal de conformidad normativa
+├── README-INSTALL.md                         <- Guía de instalación universal multi-host
+├── TRACEABILITY.md                           <- Trazabilidad 1:1 de arquitectura
+└── tests/                                    <- Suite de 148 pruebas deterministas
 ```
 
 ---
@@ -67,7 +76,7 @@ arma3-sqf-skill/
 | Host | Archivos que se copian o configuran | Destino en el Host | Modo de Operación |
 | :--- | :--- | :--- | :--- |
 | **Claude Code** | `integrations/claude/CLAUDE.md` | Raíz del proyecto / repo | Modo Archivo Completo (acceso a `references/` y `scripts/`) |
-| **Claude Desktop** | `integrations/claude/claude_desktop_config_snippet.json` | `claude_desktop_config.json` | Modo MCP Server (Track B) |
+| **Claude AI** | `arma3-sqf-skill.zip` | Settings > Skills | Skill Universal Autónomo (con sandbox Linux) |
 | **Claude Desktop** | `integrations/claude/claude_desktop_paste.md` | Chat inicial del usuario | Modo Pegado (Host degradado P1–P4) |
 | **Cursor** | `integrations/cursor/.cursorrules` | `.cursorrules` en raíz | Modo Reglas (lee `references/` bajo demanda) |
 | **OpenAI / Codex** | `integrations/openai/AGENTS.md` | `AGENTS.md` en raíz | Modo Instrucciones / CLI |

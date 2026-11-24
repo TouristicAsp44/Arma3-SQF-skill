@@ -65,7 +65,7 @@ Desarrollar para Arma 3 en servidores dedicados (`Arma3Server`) presenta desafí
 - Orden de inicialización y sincronización de red vía `remoteExec` y `publicVariable`.
 
 `arma3-sqf-skill` aplica el principio canónico **"El script es la puerta, la prosa es el flujo"**:
-1. **La prosa (`SKILL.md`)** orienta la cognición del modelo según el presupuesto de tokens (Capa 0: 1.186 tokens), cargando lentes especializadas según la intención de la tarea.
+1. **La prosa (`SKILL.md`)** orienta la cognición del modelo según el presupuesto de tokens (Capa 0: 1.091 tokens), cargando lentes especializadas según la intención de la tarea.
 2. **El script Python (`sqf_orchestrator.py`)** actúa como puerta de calidad determinista e inmutable: clasifica modos de proyecto, normaliza severidades de `sqflint` elevando violaciones de scope a `BLOQUEANTE` y aborta formalmente si persisten defectos tras 3 ciclos.
 
 ---
@@ -101,7 +101,7 @@ sqf-static-analyzer      sqf-best-practices      sqf-architect   sqf-developer  
 ```
 
 En hosts universales, las capacidades equivalentes de los agentes especializados se estructuran en:
-- **Lentes bajo demanda (`references/lenses/`)**: `locality.md` (red y servidor dedicado), `performance.md` (scheduler y bucles), `architect.md` (interfaces y modularidad), `config.md` (`description.ext` y `config.cpp`), `best_practices.md` (scope, params y sintaxis), `claims.md` (verificación contra BIKI/a3ref).
+- **Lentes bajo demanda (`references/`)**: [`lens-locality.md`](skills/arma3-sqf-skill/references/lens-locality.md) (red y servidor dedicado), [`lens-performance.md`](skills/arma3-sqf-skill/references/lens-performance.md) (scheduler y bucles), [`lens-architect.md`](skills/arma3-sqf-skill/references/lens-architect.md) (interfaces y modularidad), [`lens-config.md`](skills/arma3-sqf-skill/references/lens-config.md) (`description.ext` y `config.cpp`), [`lens-best-practices.md`](skills/arma3-sqf-skill/references/lens-best-practices.md) (scope, params y sintaxis), [`lens-claims.md`](skills/arma3-sqf-skill/references/lens-claims.md) (verificación contra BIKI/a3ref).
 - **Flujos de trabajo (`references/workflows/`)**: `modes.md` (triaje), `test_plan.md` (plan de pruebas multijugador), `documentation.md` (guías de usuario), `implementation.md` (desarrollo modular), `innovation.md` (mecánicas con presupuesto de red).
 - **Subagentes nativos (`agents/`)**: Disponibles para su ejecución cuando se instala como plugin en Google Antigravity (ver [`agents/README.md`](agents/README.md)).
 
@@ -157,36 +157,35 @@ Punto de entrada único de verificación de release gates (tests + rutas + unici
 python3 scripts/check.py --fase PR-7
 ```
 
-### 5. Servidor MCP Local sobre stdio (`--serve-mcp`)
-Arranca el servidor Model Context Protocol local para Claude Desktop y clientes compatibles:
+### 5. Empaquetado Autónomo Distribuible (`package_skill.py`)
+Genera el paquete universal `arma3-sqf-skill.zip` para su importación directa como Skill en Claude AI, ChatGPT Custom GPTs y otros entornos:
 ```bash
-python3 skills/arma3-sqf-skill/scripts/sqf_orchestrator.py --serve-mcp
+python3 scripts/package_skill.py
 ```
-Implementación en biblioteca estándar pura (JSON-RPC 2.0 por stdio, sin dependencias externas). Expone las herramientas `sqf_analyze`, `sqf_wiki_query` y `sqf_mode`.
-- Documentación técnica completa en [`docs/MCP.md`](docs/MCP.md) y postura de seguridad en [`docs/PRIVACIDAD.md`](docs/PRIVACIDAD.md).
+Construye un archivo ZIP determinista y autocontenido (113,9 KB, estrictamente < 150 KB) estructurado bajo la raíz canónica `arma3-sqf-skill/`. Postura de seguridad y confinamiento local en [`docs/PRIVACIDAD.md`](docs/PRIVACIDAD.md).
 
 ---
 
 ## 🚀 Quickstart por Host
 
-La skill está adaptada para operar en 6 entornos principales de IA. Consulta la [Matriz de Compatibilidad y Degradación](docs/COMPATIBILIDAD.md) para detalles de cada host y [docs/QUALITY.md](docs/QUALITY.md) para el informe formal de calidad.
+La skill está adaptada para operar en 6 entornos principales de IA. Consulta la [Matriz de Compatibilidad y Degradación](docs/COMPATIBILIDAD.md) para detalles de cada host, el [Informe de Conformidad Normativa](COMPATIBILITY-REPORT.md) y [docs/QUALITY.md](docs/QUALITY.md) para el informe formal de calidad.
 
 | Host | Configuración Rápida | Modo de Operación |
 | :--- | :--- | :--- |
 | **Claude Code** | Inicia `claude` en la raíz del repo. Detecta automáticamente [`integrations/claude/CLAUDE.md`](integrations/claude/CLAUDE.md). | Modo Archivo Completo |
-| **Claude Desktop** | Pega [`integrations/claude/claude_desktop_paste.md`](integrations/claude/claude_desktop_paste.md) al inicio del chat o configura MCP vía [`claude_desktop_config_snippet.json`](integrations/claude/claude_desktop_config_snippet.json). | Host Degradado / MCP |
+| **Claude Desktop** | Pega [`integrations/claude/claude_desktop_paste.md`](integrations/claude/claude_desktop_paste.md) al inicio del chat o importa `arma3-sqf-skill.zip` en Claude AI (Settings > Skills). | Modo Skill Pura / Pegado |
 | **Cursor** | Copia [`integrations/cursor/.cursorrules`](integrations/cursor/.cursorrules) a la raíz del espacio de trabajo. | Modo Reglas y Archivo |
 | **OpenAI / Codex** | Coloca [`integrations/openai/AGENTS.md`](integrations/openai/AGENTS.md) como instrucciones de sistema o agente. | Modo CLI / Instrucciones |
 | **ChatGPT Custom GPT** | Pega [`integrations/chatgpt/custom_gpt_instructions.md`](integrations/chatgpt/custom_gpt_instructions.md) y sube los 18 archivos del [manifiesto](integrations/chatgpt/knowledge_manifest.md). | Host Degradado (RAG) |
 | **Google Gemini** | Pega [`integrations/gemini/system_instruction.md`](integrations/gemini/system_instruction.md) en System Instructions en AI Studio o API. | Host Degradado (Inline) |
 
-Guía de instalación paso a paso en [INSTALL.md](INSTALL.md). Historial de versiones y trazabilidad de cambios en [CHANGELOG.md](CHANGELOG.md).
+Guía de instalación paso a paso en [README-INSTALL.md](README-INSTALL.md) y [INSTALL.md](INSTALL.md). Trazabilidad de arquitectura en [TRACEABILITY.md](TRACEABILITY.md). Historial de versiones y notas de release en [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
 ## 📦 Instalación y Requisitos
 
-Consulta la guía detallada de instalación en [INSTALL.md](INSTALL.md).
+Consulta la guía detallada de instalación en [README-INSTALL.md](README-INSTALL.md) y [INSTALL.md](INSTALL.md).
 
 ### Requisitos Básicos
 - **Python**: 3.11 o superior.
@@ -194,7 +193,7 @@ Consulta la guía detallada de instalación en [INSTALL.md](INSTALL.md).
 - *(Opcional)* **`sqflint`**: Linter nativo de SQF (`cargo install sqflint`). Si no está presente, la herramienta degrada de forma transparente y honesta a `NO VERIFICADO`.
 
 ### Réplica Offline BIKI y Dataset `a3ref`
-Para validar comandos y funciones offline con exactitud criptográfica, clona `a3ref` y configura `SQF_WIKI_DATA_PATH` (ver [INSTALL.md](INSTALL.md) y [docs/WIKI-DB.md](docs/WIKI-DB.md)). Si no se instala, la skill degrada con honestidad técnica a `NO VERIFICADO` en comprobaciones wiki.
+Para validar comandos y funciones offline con exactitud criptográfica, clona `a3ref` y configura `SQF_WIKI_DATA_PATH` (ver [README-INSTALL.md](README-INSTALL.md) y [docs/WIKI-DB.md](docs/WIKI-DB.md)). Si no se instala, la skill degrada con honestidad técnica a `NO VERIFICADO` en comprobaciones wiki.
 
 ---
 
@@ -203,13 +202,13 @@ Para validar comandos y funciones offline con exactitud criptográfica, clona `a
 1. **El dataset completo offline de `a3ref` ni la base de datos `arma3_wiki.db`**: Se mantienen fuera del repositorio para garantizar ligereza. La base de datos SQLite puede construirse localmente en ~1 segundo con `wiki_db_builder.py build` (acelera búsquedas hasta 520x). Sin el dataset, el estado degrada con honestidad técnica a `SIN_REPLICA` / `NO VERIFICADO`.
 2. **El binario ejecutable de `sqflint`**: No se empaquetan binarios precompilados de plataforma.
 3. **Dependencias de terceros en tiempo de ejecución**: El motor CLI determinista opera exclusivamente sobre la biblioteca estándar de Python (>=3.11).
-4. **Acoplamiento a orquestadores multi-agente cerrados**: Diseñada bajo arquitectura modular y en capas para operar en cualquier LLM moderno.
+4. **Acoplamiento a orquestadores multi-agente cerrados ni daemons en segundo plano**: Diseñada bajo arquitectura de Skill Pura Universal para operar en cualquier LLM moderno sin servidores MCP ni procesos residentes.
 
 ---
 
 ## 🧪 Arnés de Pruebas
 
-El repositorio cuenta con una suite integral de 146 pruebas automatizadas que validan análisis sintáctico, resolución de enlaces relativos, paridad de agentes, base SQLite y contratos del servidor MCP:
+El repositorio cuenta con una suite integral de 148 pruebas automatizadas que validan análisis sintáctico, resolución de enlaces relativos, paridad de agentes, base SQLite, códigos de salida y contratos CLI:
 
 ```bash
 python -m pytest tests/ -q

@@ -30,7 +30,7 @@ Esta guía describe cómo crear y configurar el Custom GPT para `arma3-sqf-skill
 2. Sube únicamente los **18 archivos** especificados en `integrations/chatgpt/knowledge_manifest.md`:
    - `SKILL.md`
    - Los 6 archivos base de `references/` (invariants, sqf-standards, rubrica, report_format, checklist-entrega, diferencial-misiones-addons).
-   - Los 6 archivos de `references/lenses/` (architect, best_practices, claims, config, locality, performance).
+   - Los 6 archivos de referencias planas `references/lens-*.md` (lens-architect.md, lens-best-practices.md, lens-claims.md, lens-config.md, lens-locality.md, lens-performance.md).
    - Los 5 archivos de `references/workflows/` (audit, doc, fix_loop, new_feature, test_plan).
 3. **No subas** `references/wiki-cache.md` ni archivos de código `.py`.
 

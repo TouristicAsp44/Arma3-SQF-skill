@@ -31,19 +31,14 @@ Instrucciones completas para instalar la skill universal de SQF para Arma 3 en c
    python scripts/check.py --fase PR-6
    ```
 
-### 2.2 Claude Desktop
-Claude Desktop admite dos modalidades de integración:
-- **Opción A (Sin MCP — Modo Pegado)**:
-  Copia el contenido del archivo generado `integrations/claude/claude_desktop_paste.md` y pégalo al inicio de la conversación. Es el fallback inmediato si no se desea configurar procesos locales.
-- **Opción B (Con MCP Local — Track B / PR-6)**:
-  Integra el servidor MCP local por stdio (`sqf_orchestrator.py --serve-mcp`) en `claude_desktop_config.json` usando el fragmento de `integrations/claude/claude_desktop_config_snippet.json`.
-  - **¿Qué es?**: Servidor JSON-RPC 2.0 por stdio (stdlib pura) que expone `sqf_analyze`, `sqf_wiki_query` y `sqf_mode`.
-  - **¿Cuándo lo necesitas?**: Para que Claude Desktop invoque el motor de análisis y la wiki automáticamente en local.
-  - **¿Cuándo NO lo necesitas?**: En Claude Code, Cursor o Antigravity (que ya tienen acceso a archivos), o usando el modo pegado.
-  - Consulta la guía detallada en [`docs/MCP.md`](docs/MCP.md) y [`integrations/claude/install.md`](integrations/claude/install.md).
+### 2.2 Claude AI y Claude Desktop
+- **Opción A (Claude AI — Subida como Skill Autónomo)**:
+  Sube el archivo empaquetado `arma3-sqf-skill.zip` directamente en la interfaz de Claude AI (**Settings > Skills**). Claude AI desempaqueta la skill en su sandbox Linux y ejecuta automáticamente `scripts/bootstrap.sh` para preparar la réplica offline `a3ref` y la base de datos FTS5 SQLite.
+- **Opción B (Claude Desktop — Modo Pegado)**:
+  Copia el contenido del archivo generado `integrations/claude/claude_desktop_paste.md` y pégalo al inicio de la conversación para operar bajo el protocolo normativo P1–P4 en hosts sin acceso a terminal local.
 - **Comando de verificación**:
   ```bash
-  python -m pytest tests/test_mcp_server.py
+  python -m pytest tests/test_host_adapters.py -k claude
   ```
 
 ### 2.3 Cursor

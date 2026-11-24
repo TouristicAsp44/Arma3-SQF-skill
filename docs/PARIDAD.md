@@ -29,9 +29,9 @@ Leyenda de estado:
 ## A-bis. Alcance y No Portabilidad de `agents/`
 
 1. **Definiciones Exclusivas de Antigravity**: Los archivos en `agents/` son subagentes que utilizan frontmatter exclusivo del entorno Google Antigravity (`subagent: true`, `mainAgent: false`, `model`, `commandExecutionPolicy: sandbox`, `tools`). No son portables ni se cargan en hosts como Claude Code, Cursor, Codex, ChatGPT o Gemini.
-2. **Equivalencia Funcional Completa**: Ningún host externo pierde capacidades al no cargar `agents/`, ya que toda la inteligencia técnica, reglas, heurísticas y rúbricas fueron trasladadas a las lentes modulares bajo demanda (`references/lenses/`), flujos de trabajo (`references/workflows/`) y scripts deterministas (`scripts/sqf_orchestrator.py`).
+2. **Equivalencia Funcional Completa**: Ningún host externo pierde capacidades al no cargar `agents/`, ya que toda la inteligencia técnica, reglas, heurísticas y rúbricas fueron trasladadas a las lentes planas bajo demanda (`references/lens-*.md`), flujos de trabajo (`references/workflows/`) y scripts deterministas (`scripts/sqf_orchestrator.py`).
 3. **Precedencia Normativa**: Si un subagente de `agents/` y los documentos canónicos discrepan, **prevalece estrictamente el canónico** (`references/invariants.md`, `references/sqf-standards.md`, `references/rubrica.md`).
-4. **Snapshot Histórico**: `legacy/agents/` representa el snapshot histórico congelado del plugin original y no se empaqueta ni distribuye. `legacy/agents/sqf-claim-verifier.md` conserva intencionadamente la versión anterior a la corrección de rutas pre-2026-11-19, mientras que `agents/sqf-claim-verifier.md` es la versión corregida y vigente.
+4. **Histórico y Depuración**: Los snapshots históricos de agentes heredados del plugin original fueron purgados en la versión 2.0.0 para maximizar la ventana de contexto y portabilidad, conservándose `agents/` exclusivamente para Antigravity.
 
 ## B. Comportamientos normativos (18)
 

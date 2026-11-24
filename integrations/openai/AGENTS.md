@@ -8,7 +8,7 @@ Aplica estas directivas al procesar archivos `.sqf`, `.ext`, `.hpp`, `descriptio
 Todas las rutas de la skill son relativas a `skills/arma3-sqf-skill/`:
 - Entrada unificada: `skills/arma3-sqf-skill/SKILL.md`
 - Invariantes normativos: `skills/arma3-sqf-skill/references/invariants.md`
-- Lentes de disciplina: `skills/arma3-sqf-skill/references/lenses/`
+- Lentes de disciplina: `skills/arma3-sqf-skill/references/lens-*.md`
 - Rúbrica de severidad: `skills/arma3-sqf-skill/references/rubrica.md`
 
 ## Checklist Condensado Inline (N2)

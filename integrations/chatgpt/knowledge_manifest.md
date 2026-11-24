@@ -27,12 +27,12 @@ Este documento establece la lista exacta y justificada de archivos que deben sub
 | 5 | `references/report_format.md` | Contrato de Salida | Esquema formal del informe v1 emitido. |
 | 6 | `references/checklist-entrega.md` | Verificación Final | Criterios de cierre y entrega sin bloqueantes abiertos. |
 | 7 | `references/diferencial-misiones-addons.md` | Configuración | Diferencias de contexto de ejecución entre misiones (`description.ext`) y addons (`config.cpp`). |
-| 8 | `references/lenses/architect.md` | Lente Arquitectura | Diseño modular, contratos de interfaces y desacoplamiento. |
-| 9 | `references/lenses/best_practices.md` | Lente Buenas Prácticas | Evaluación perezosa, micro-optimizaciones y buenas prácticas SQF. |
-| 10 | `references/lenses/claims.md` | Lente Verificación | Protocolo de verificación de afirmaciones técnicas contra BIKI. |
-| 11 | `references/lenses/config.md` | Lente Configuración | Reglas de `CfgRemoteExec`, whitelist de funciones y orden de init. |
-| 12 | `references/lenses/locality.md` | Lente Locality | Reglas de multijugador, remoteExec, JIP y servidor dedicado. |
-| 13 | `references/lenses/performance.md` | Lente Rendimiento | Scheduler, bucles, PFH y prevención de saturación de frames. |
+| 8 | `references/lens-architect.md` | Lente Arquitectura | Diseño modular, contratos de interfaces y desacoplamiento. |
+| 9 | `references/lens-best-practices.md` | Lente Buenas Prácticas | Evaluación perezosa, micro-optimizaciones y buenas prácticas SQF. |
+| 10 | `references/lens-claims.md` | Lente Verificación | Protocolo de verificación de afirmaciones técnicas contra BIKI. |
+| 11 | `references/lens-config.md` | Lente Configuración | Reglas de `CfgRemoteExec`, whitelist de funciones y orden de init. |
+| 12 | `references/lens-locality.md` | Lente Locality | Reglas de multijugador, remoteExec, JIP y servidor dedicado. |
+| 13 | `references/lens-performance.md` | Lente Rendimiento | Scheduler, bucles, PFH y prevención de saturación de frames. |
 | 14 | `references/workflows/audit.md` | Flujo de Auditoría | Paso a paso para auditar scripts o sistemas existentes. |
 | 15 | `references/workflows/doc.md` | Flujo de Documentación | Redacción de guías técnicas y documentación de API SQF. |
 | 16 | `references/workflows/fix_loop.md` | Flujo de Corrección | Ciclo de corrección de bloqueantes (máximo 3 iteraciones). |

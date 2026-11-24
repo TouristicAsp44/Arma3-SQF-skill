@@ -11,12 +11,12 @@ Claude Code cuenta con acceso completo a herramientas de lectura de archivos y e
    `skills/arma3-sqf-skill/SKILL.md`
 2. Todas las rutas de archivos dentro de la skill son relativas a la raíz del repositorio (`skills/arma3-sqf-skill/`).
 3. Para consultar reglas específicas por disciplina, lee la lente correspondiente bajo demanda:
-   - `skills/arma3-sqf-skill/references/lenses/locality.md` (red, JIP, dedicado)
-   - `skills/arma3-sqf-skill/references/lenses/performance.md` (scheduler, bucles, PFH)
-   - `skills/arma3-sqf-skill/references/lenses/best_practices.md` (scope, nomenclatura)
-   - `skills/arma3-sqf-skill/references/lenses/architect.md` (diseño, contratos)
-   - `skills/arma3-sqf-skill/references/lenses/config.md` (CfgRemoteExec, description.ext)
-   - `skills/arma3-sqf-skill/references/lenses/claims.md` (verificación BIKI)
+   - `skills/arma3-sqf-skill/references/lens-locality.md` (red, JIP, dedicado)
+   - `skills/arma3-sqf-skill/references/lens-performance.md` (scheduler, bucles, PFH)
+   - `skills/arma3-sqf-skill/references/lens-best-practices.md` (scope, nomenclatura)
+   - `skills/arma3-sqf-skill/references/lens-architect.md` (diseño, contratos)
+   - `skills/arma3-sqf-skill/references/lens-config.md` (CfgRemoteExec, description.ext)
+   - `skills/arma3-sqf-skill/references/lens-claims.md` (verificación BIKI)
 
 ### Ejecución de Herramientas Locales
 - Determinación de modo de análisis:

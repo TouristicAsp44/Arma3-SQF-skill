@@ -3,6 +3,9 @@
 # Inclusiones explícitas
 include README.md
 include INSTALL.md
+include README-INSTALL.md
+include COMPATIBILITY-REPORT.md
+include TRACEABILITY.md
 include LICENSE
 include CONTRIBUTING.md
 include CHANGELOG.md
